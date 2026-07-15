@@ -343,7 +343,7 @@ selection_click(struct selection *s,
 	     (modkeys && (mouse & BROWSER_MOUSE_DRAG_2)))) {
 		/* drag-saving selection */
 		char *sel = selection_get_copy(s);
-		guit->window->drag_save_selection(top->window, sel);
+		gui_window_drag_save_selection(top->window, sel);
 		free(sel);
 	} else if (!modkeys) {
 		if (pos && (mouse & BROWSER_MOUSE_PRESS_1)) {
@@ -364,7 +364,7 @@ selection_click(struct selection *s,
 
 			s->drag_state = DRAG_END;
 
-			guit->window->event(top->window,
+			gui_window_event(top->window,
 					    GW_EVENT_START_SELECTION);
 
 		} else if (mouse & BROWSER_MOUSE_DRAG_2) {
@@ -384,7 +384,7 @@ selection_click(struct selection *s,
 				s->drag_state = DRAG_START;
 			}
 
-			guit->window->event(top->window,
+			gui_window_event(top->window,
 					    GW_EVENT_START_SELECTION);
 
 		} else if (mouse & BROWSER_MOUSE_CLICK_2) {

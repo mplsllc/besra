@@ -451,7 +451,7 @@ nserror browser_window_history_update(struct browser_window *bw,
 	}
 
 	if ((bw->window != NULL) &&
-	    guit->window->get_scroll(bw->window, &sx, &sy)) {
+	    gui_window_get_scroll(bw->window, &sx, &sy)) {
 		int content_height = content_get_height(content);
 		int content_width = content_get_width(content);
 		/* clamp width and height values */

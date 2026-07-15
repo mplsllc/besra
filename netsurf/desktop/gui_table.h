@@ -27,7 +27,6 @@
 #ifndef _NETSURF_DESKTOP_GUI_TABLE_H_
 #define _NETSURF_DESKTOP_GUI_TABLE_H_
 
-struct gui_window_table;
 struct gui_layout_table;
 
 /**
@@ -36,15 +35,6 @@ struct gui_layout_table;
  * Function table implementing interface operations for the browser core.
  */
 struct netsurf_table {
-
-	/**
-	 * Window table.
-	 *
-	 * Provides all operations which affect a frontends display window.
-	 *
-	 * The table is mandantory and must be provided.
-	 */
-	struct gui_window_table *window;
 
 	/**
 	 * Layout table

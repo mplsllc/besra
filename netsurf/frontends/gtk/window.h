@@ -21,7 +21,6 @@
 
 struct nsgtk_pi_window;
 
-extern struct gui_window_table *nsgtk_window_table;
 
 extern struct gui_window *window_list;
 

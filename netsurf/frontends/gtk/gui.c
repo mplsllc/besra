@@ -1183,7 +1183,6 @@ int main(int argc, char** argv)
 	nserror res;
 	char *cache_home = NULL;
 	struct netsurf_table nsgtk_table = {
-		.window = nsgtk_window_table,
 		.layout = nsgtk_layout_table,
 	};
 

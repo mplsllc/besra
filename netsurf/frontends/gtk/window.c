@@ -827,7 +827,7 @@ static void next_throbber_frame(void *p)
  * Front end's gui_window must include a reference to the
  * browser window passed in the bw param.
  */
-static struct gui_window *
+struct gui_window *
 gui_window_create(struct browser_window *bw,
 		  struct gui_window *existing,
 		  gui_window_create_flags flags)
@@ -1008,7 +1008,7 @@ gui_window_create(struct browser_window *bw,
 }
 
 
-static void gui_window_destroy(struct gui_window *gw)
+void gui_window_destroy(struct gui_window *gw)
 {
 	NSLOG(netsurf, INFO, "gui_window: %p", gw);
 	assert(gw != NULL);
@@ -1039,7 +1039,7 @@ static void gui_window_destroy(struct gui_window *gw)
  * \param gw gtk gui window to set favicon on.
  * \param icon A handle to the new favicon content.
  */
-static void
+void
 gui_window_set_icon(struct gui_window *gw, struct hlcache_handle *icon)
 {
 	struct bitmap *icon_bitmap = NULL;
@@ -1071,7 +1071,7 @@ gui_window_set_icon(struct gui_window *gw, struct hlcache_handle *icon)
 }
 
 
-static bool gui_window_get_scroll(struct gui_window *g, int *sx, int *sy)
+bool gui_window_get_scroll(struct gui_window *g, int *sx, int *sy)
 {
 	GtkAdjustment *vadj = nsgtk_layout_get_vadjustment(g->layout);
 	GtkAdjustment *hadj = nsgtk_layout_get_hadjustment(g->layout);
@@ -1126,8 +1126,8 @@ static void gui_window_remove_caret(struct gui_window *g)
  * \param rect area to redraw or NULL for the entire window area
  * \return NSERROR_OK on success or appropriate error code
  */
-static nserror
-nsgtk_window_invalidate_area(struct gui_window *g, const struct rect *rect)
+nserror
+gui_window_invalidate(struct gui_window *g, const struct rect *rect)
 {
 	int sx, sy;
 
@@ -1152,7 +1152,7 @@ nsgtk_window_invalidate_area(struct gui_window *g, const struct rect *rect)
 }
 
 
-static void gui_window_set_status(struct gui_window *g, const char *text)
+void gui_window_set_status(struct gui_window *g, const char *text)
 {
 	assert(g);
 	assert(g->status_bar);
@@ -1171,7 +1171,7 @@ static void gui_window_set_status(struct gui_window *g, const char *text)
  * \param rect The rectangle to ensure is shown.
  * \return NSERROR_OK on success or apropriate error code.
  */
-static nserror
+nserror
 gui_window_set_scroll(struct gui_window *g, const struct rect *rect)
 {
 	GtkAdjustment *vadj = nsgtk_layout_get_vadjustment(g->layout);
@@ -1217,7 +1217,7 @@ static void gui_window_update_extent(struct gui_window *g)
 }
 
 
-static void
+void
 gui_window_set_pointer(struct gui_window *g, gui_pointer_shape shape)
 {
 	GdkCursor *cursor = NULL;
@@ -1303,7 +1303,7 @@ gui_window_set_pointer(struct gui_window *g, gui_pointer_shape shape)
 }
 
 
-static void
+void
 gui_window_place_caret(struct gui_window *g,
 		       int x, int y, int height,
 		       const struct rect *clip)
@@ -1341,7 +1341,7 @@ gui_window_place_caret(struct gui_window *g,
  * \return NSERROR_OK on sucess and width and height updated
  *          else error code.
  */
-static nserror
+nserror
 gui_window_get_dimensions(struct gui_window *gw, int *width, int *height)
 {
 	GtkAllocation alloc;
@@ -1362,7 +1362,7 @@ static void gui_window_start_selection(struct gui_window *g)
 }
 
 
-static void
+void
 gui_window_create_form_select_menu(struct gui_window *g,
 				   struct form_control *control)
 {
@@ -1420,7 +1420,7 @@ gui_window_create_form_select_menu(struct gui_window *g,
  *
  * \param g The gui window on which the gadget has been requested
  */
-static void
+void
 gui_window_file_gadget_open(struct gui_window *g,
 			    struct hlcache_handle *hl,
 			    struct form_control *gadget)
@@ -1488,7 +1488,7 @@ static nserror page_info_change(struct gui_window *gw)
  * \param event The event code.
  * \return NSERROR_OK when processed ok
  */
-static nserror
+nserror
 gui_window_event(struct gui_window *gw, enum gui_window_event event)
 {
 	switch (event) {
@@ -1529,7 +1529,7 @@ gui_window_event(struct gui_window *gw, enum gui_window_event event)
  * \param gw The gui window on which the url has been set.
  * \param url The new url.
  */
-static nserror gui_window_set_url(struct gui_window *gw, nsurl *url)
+nserror gui_window_set_url(struct gui_window *gw, nsurl *url)
 {
 	return nsgtk_toolbar_set_url(gw->toolbar, url);
 }
@@ -1541,7 +1541,7 @@ static nserror gui_window_set_url(struct gui_window *gw, nsurl *url)
  * \param gw The gui window on which the url has been set.
  * \param url The new url.
  */
-static void gui_window_set_title(struct gui_window *gw, const char *title)
+void gui_window_set_title(struct gui_window *gw, const char *title)
 {
 
 	if ((title != NULL) && (title[0] != '\0')) {
@@ -1587,29 +1587,6 @@ gui_search_web_provider_update(const char *name, struct bitmap *bitmap)
 /**
  * GTK frontend browser window operation table
  */
-static struct gui_window_table window_table = {
-	.create = gui_window_create,
-	.destroy = gui_window_destroy,
-	.invalidate = nsgtk_window_invalidate_area,
-	.get_scroll = gui_window_get_scroll,
-	.set_scroll = gui_window_set_scroll,
-	.get_dimensions = gui_window_get_dimensions,
-	.event = gui_window_event,
-
-	.set_icon = gui_window_set_icon,
-	.set_title = gui_window_set_title,
-	.set_status = gui_window_set_status,
-	.set_pointer = gui_window_set_pointer,
-	.place_caret = gui_window_place_caret,
-	.create_form_select_menu = gui_window_create_form_select_menu,
-	.file_gadget_open = gui_window_file_gadget_open,
-	.set_url = gui_window_set_url,
-
-
-};
-
-struct gui_window_table *nsgtk_window_table = &window_table;
-
 
 /* exported interface documented in window.h */
 struct nsgtk_scaffolding *nsgtk_get_scaffold(struct gui_window *g)

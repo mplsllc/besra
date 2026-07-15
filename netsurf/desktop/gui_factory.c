@@ -50,162 +50,6 @@
 struct netsurf_table *guit = NULL;
 
 
-static void gui_default_window_set_title(struct gui_window *g, const char *title)
-{
-}
-
-static nserror gui_default_window_set_url(struct gui_window *g, struct nsurl *url)
-{
-	return NSERROR_OK;
-}
-
-static bool gui_default_window_drag_start(struct gui_window *g,
-					  gui_drag_type type,
-					  const struct rect *rect)
-{
-	return true;
-}
-
-static nserror gui_default_window_save_link(struct gui_window *g,
-					 nsurl *url,
-					 const char *title)
-{
-	return NSERROR_OK;
-}
-
-static void gui_default_window_set_icon(struct gui_window *g,
-					hlcache_handle *icon)
-{
-}
-
-static void gui_default_window_set_pointer(struct gui_window *g,
-					   gui_pointer_shape shape)
-{
-}
-
-static void gui_default_window_set_status(struct gui_window *g,
-					  const char *text)
-{
-}
-
-static void gui_default_window_place_caret(struct gui_window *g,
-					   int x, int y, int height,
-					   const struct rect *clip)
-{
-}
-
-static void gui_default_window_create_form_select_menu(struct gui_window *g,
-						struct form_control *control)
-{
-}
-
-static void gui_default_window_file_gadget_open(struct gui_window *g,
-						hlcache_handle *hl,
-						struct form_control *gadget)
-{
-}
-
-static void gui_default_window_drag_save_object(struct gui_window *g,
-						hlcache_handle *c,
-						gui_save_type type)
-{
-}
-
-static void gui_default_window_drag_save_selection(struct gui_window *g,
-						   const char *selection)
-{
-}
-
-
-static void
-gui_default_console_log(struct gui_window *gw,
-			browser_window_console_source src,
-			const char *msg,
-			size_t msglen,
-			browser_window_console_flags flags)
-{
-}
-
-
-/** verify window table is valid */
-static nserror verify_window_register(struct gui_window_table *gwt)
-{
-	/* check table is present */
-	if (gwt == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-
-	/* check the mandantory fields are set */
-	if (gwt->create == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-	if (gwt->destroy == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-	if (gwt->invalidate == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-	if (gwt->get_scroll == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-	if (gwt->set_scroll == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-	if (gwt->get_dimensions == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-	if (gwt->event == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-
-
-	/* fill in the optional entries with defaults */
-	if (gwt->set_title == NULL) {
-		gwt->set_title = gui_default_window_set_title;
-	}
-	if (gwt->set_url == NULL) {
-		gwt->set_url = gui_default_window_set_url;
-	}
-	if (gwt->set_icon == NULL) {
-		gwt->set_icon = gui_default_window_set_icon;
-	}
-	if (gwt->set_status == NULL) {
-		gwt->set_status = gui_default_window_set_status;
-	}
-	if (gwt->set_pointer == NULL) {
-		gwt->set_pointer = gui_default_window_set_pointer;
-	}
-	if (gwt->place_caret == NULL) {
-		gwt->place_caret = gui_default_window_place_caret;
-	}
-	if (gwt->drag_start == NULL) {
-		gwt->drag_start = gui_default_window_drag_start;
-	}
-	if (gwt->save_link == NULL) {
-		gwt->save_link = gui_default_window_save_link;
-	}
-	if (gwt->create_form_select_menu == NULL) {
-		gwt->create_form_select_menu =
-				gui_default_window_create_form_select_menu;
-	}
-	if (gwt->file_gadget_open == NULL) {
-		gwt->file_gadget_open = gui_default_window_file_gadget_open;
-	}
-	if (gwt->drag_save_object == NULL) {
-		gwt->drag_save_object = gui_default_window_drag_save_object;
-	}
-	if (gwt->drag_save_selection == NULL) {
-		gwt->drag_save_selection = gui_default_window_drag_save_selection;
-	}
-	if (gwt->console_log == NULL) {
-		gwt->console_log = gui_default_console_log;
-	}
-
-	return NSERROR_OK;
-}
-
-
-
 /**
  * verify layout table is valid
  *
@@ -252,23 +96,12 @@ nserror netsurf_register(struct netsurf_table *gt)
 
 	/* mandantory tables */
 
-	/* window table */
-	err = verify_window_register(gt->window);
-	if (err != NSERROR_OK) {
-		return err;
-	}
-
 	/* layout table */
 	err = verify_layout_register(gt->layout);
 	if (err != NSERROR_OK) {
 		return err;
 	}
 
-	/* optional tables */
-
-
-
-	/* search table */
 	guit = gt;
 
 	return NSERROR_OK;

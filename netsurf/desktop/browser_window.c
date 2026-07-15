@@ -241,7 +241,7 @@ static nserror
 browser_window_set_scroll(struct browser_window *bw, const struct rect *rect)
 {
 	if (bw->window != NULL) {
-		return guit->window->set_scroll(bw->window, rect);
+		return gui_window_set_scroll(bw->window, rect);
 	}
 
 	if (bw->scroll_x != NULL) {
@@ -400,7 +400,7 @@ static nserror browser_window_start_throbber(struct browser_window *bw)
 	while (bw->parent)
 		bw = bw->parent;
 
-	return guit->window->event(bw->window, GW_EVENT_START_THROBBER);
+	return gui_window_event(bw->window, GW_EVENT_START_THROBBER);
 }
 
 
@@ -420,7 +420,7 @@ static nserror browser_window_stop_throbber(struct browser_window *bw)
 	}
 
 	if (!browser_window_check_throbber(bw)) {
-		res = guit->window->event(bw->window, GW_EVENT_STOP_THROBBER);
+		res = gui_window_event(bw->window, GW_EVENT_STOP_THROBBER);
 	}
 	return res;
 }
@@ -454,7 +454,7 @@ browser_window_favicon_callback(hlcache_handle *c,
 		/* content_get_bitmap on the hlcache_handle should give
 		 *   the favicon bitmap at this point
 		 */
-		guit->window->set_icon(bw->window, c);
+		gui_window_set_icon(bw->window, c);
 		break;
 
 	case CONTENT_MSG_ERROR:
@@ -750,7 +750,7 @@ static void browser_window_update(struct browser_window *bw, bool scroll_to_top)
 
 	case BROWSER_WINDOW_NORMAL:
 		/* Root browser window, constituting a front end window/tab */
-		guit->window->set_title(bw->window,
+		gui_window_set_title(bw->window,
 					content_get_title(bw->current_content));
 
 		browser_window_update_extent(bw);
@@ -763,7 +763,7 @@ static void browser_window_update(struct browser_window *bw, bool scroll_to_top)
 			}
 		}
 
-		guit->window->invalidate(bw->window, NULL);
+		gui_window_invalidate(bw->window, NULL);
 
 		break;
 
@@ -893,7 +893,7 @@ static nserror browser_window_content_ready(struct browser_window *bw)
 	browser_window_remove_caret(bw, false);
 
 	if (bw->window != NULL) {
-		guit->window->event(bw->window, GW_EVENT_NEW_CONTENT);
+		gui_window_event(bw->window, GW_EVENT_NEW_CONTENT);
 
 		browser_window_refresh_url_bar(bw);
 	}
@@ -912,7 +912,7 @@ static nserror browser_window_content_ready(struct browser_window *bw)
 	/* Indicate page status may have changed */
 	if (res == NSERROR_OK) {
 		struct browser_window *root = browser_window_get_root(bw);
-		res = guit->window->event(root->window, GW_EVENT_PAGE_INFO_CHANGE);
+		res = gui_window_event(root->window, GW_EVENT_PAGE_INFO_CHANGE);
 	}
 
 	return res;
@@ -1439,7 +1439,7 @@ browser_window_refresh_url_bar_internal(struct browser_window *bw, nsurl *url)
 		return NSERROR_OK;
 	}
 
-	return guit->window->set_url(bw->window, url);
+	return gui_window_set_url(bw->window, url);
 }
 
 
@@ -1665,25 +1665,25 @@ browser_window_callback(hlcache_handle *c, const hlcache_event *event, void *pw)
 
 			switch(event->data.dragsave.type) {
 			case CONTENT_SAVE_ORIG:
-				guit->window->drag_save_object(root->window,
+				gui_window_drag_save_object(root->window,
 							       save,
 							       GUI_SAVE_OBJECT_ORIG);
 				break;
 
 			case CONTENT_SAVE_NATIVE:
-				guit->window->drag_save_object(root->window,
+				gui_window_drag_save_object(root->window,
 							       save,
 							       GUI_SAVE_OBJECT_NATIVE);
 				break;
 
 			case CONTENT_SAVE_COMPLETE:
-				guit->window->drag_save_object(root->window,
+				gui_window_drag_save_object(root->window,
 							       save,
 							       GUI_SAVE_COMPLETE);
 				break;
 
 			case CONTENT_SAVE_SOURCE:
-				guit->window->drag_save_object(root->window,
+				gui_window_drag_save_object(root->window,
 							       save,
 							       GUI_SAVE_SOURCE);
 				break;
@@ -1695,7 +1695,7 @@ browser_window_callback(hlcache_handle *c, const hlcache_event *event, void *pw)
 		{
 			/* Content wants a link to be saved */
 			struct browser_window *root = browser_window_get_root(bw);
-			guit->window->save_link(root->window,
+			gui_window_save_link(root->window,
 						event->data.savelink.url,
 						event->data.savelink.title);
 		}
@@ -1753,7 +1753,7 @@ browser_window_callback(hlcache_handle *c, const hlcache_event *event, void *pw)
 		if (event->data.select_menu.gadget->type == GADGET_SELECT) {
 			struct browser_window *root =
 				browser_window_get_root(bw);
-			guit->window->create_form_select_menu(root->window,
+			gui_window_create_form_select_menu(root->window,
 							      event->data.select_menu.gadget);
 		}
 
@@ -1763,7 +1763,7 @@ browser_window_callback(hlcache_handle *c, const hlcache_event *event, void *pw)
 		if (event->data.gadget_click.gadget->type == GADGET_FILE) {
 			struct browser_window *root =
 				browser_window_get_root(bw);
-			guit->window->file_gadget_open(root->window, c,
+			gui_window_file_gadget_open(root->window, c,
 						       event->data.gadget_click.gadget);
 		}
 
@@ -1822,7 +1822,7 @@ static void scheduled_reformat(void *vbw)
 	int height;
 	nserror res;
 
-	res = guit->window->get_dimensions(bw->window, &width, &height);
+	res = gui_window_get_dimensions(bw->window, &width, &height);
 	if (res == NSERROR_OK) {
 		browser_window_reformat(bw, false, width, height);
 	}
@@ -1871,7 +1871,7 @@ nserror browser_window_destroy_internal(struct browser_window *bw)
 
 	if (bw->window) {
 		/* Only the root window has a GUI window */
-		guit->window->destroy(bw->window);
+		gui_window_destroy(bw->window);
 	}
 
 	if (bw->loading_content != NULL) {
@@ -2205,10 +2205,10 @@ browser_window_mouse_click_internal(struct browser_window *bw,
 	default:
 		if (mouse & BROWSER_MOUSE_MOD_2) {
 			if (mouse & BROWSER_MOUSE_DRAG_2) {
-				guit->window->drag_save_object(bw->window, c,
+				gui_window_drag_save_object(bw->window, c,
 							       GUI_SAVE_OBJECT_NATIVE);
 			} else if (mouse & BROWSER_MOUSE_DRAG_1) {
-				guit->window->drag_save_object(bw->window, c,
+				gui_window_drag_save_object(bw->window, c,
 							       GUI_SAVE_OBJECT_ORIG);
 			}
 		} else if (mouse & (BROWSER_MOUSE_DRAG_1 |
@@ -2779,7 +2779,7 @@ void browser_window_update_extent(struct browser_window *bw)
 {
 	if (bw->window != NULL) {
 		/* Front end window */
-		guit->window->event(bw->window, GW_EVENT_UPDATE_EXTENT);
+		gui_window_event(bw->window, GW_EVENT_UPDATE_EXTENT);
 	} else {
 		/* Core-managed browser window */
 		browser_window_handle_scrollbars(bw);
@@ -2880,7 +2880,7 @@ browser_window_set_drag_type(struct browser_window *bw,
 			break;
 		}
 
-		guit->window->drag_start(top_bw->window, gtype, rect);
+		gui_window_drag_start(top_bw->window, gtype, rect);
 	}
 }
 
@@ -3136,7 +3136,7 @@ browser_window_create(enum browser_window_create_flags flags,
 	if (flags & BW_CREATE_FOCUS_LOCATION)
 		gw_flags |= GW_CREATE_FOCUS_LOCATION;
 
-	ret->window = guit->window->create(ret,
+	ret->window = gui_window_create(ret,
 					   (existing != NULL) ? existing->window : NULL,
 					   gw_flags);
 
@@ -3561,7 +3561,7 @@ navigate_internal_real(struct browser_window *bw,
 		bw->loading_content = c;
 		browser_window_start_throbber(bw);
 		if (bw->window != NULL) {
-			guit->window->set_icon(bw->window, NULL);
+			gui_window_set_icon(bw->window, NULL);
 		}
 		if (bw->internal_nav == false) {
 			res = browser_window_refresh_url_bar_internal(bw,
@@ -4014,7 +4014,7 @@ browser_window_get_dimensions(struct browser_window *bw,
 		res = NSERROR_OK;
 	} else {
 		/* Front end window */
-		res = guit->window->get_dimensions(bw->window, width, height);
+		res = gui_window_get_dimensions(bw->window, width, height);
 	}
 	return res;
 }
@@ -4065,7 +4065,7 @@ browser_window_invalidate_rect(struct browser_window *bw, struct rect *rect)
 	rect->x1 *= top->scale;
 	rect->y1 *= top->scale;
 
-	return guit->window->invalidate(top->window, rect);
+	return gui_window_invalidate(top->window, rect);
 }
 
 
@@ -4191,7 +4191,7 @@ void browser_window_set_status(struct browser_window *bw, const char *text)
 	}
 
 	bw->status.miss++;
-	guit->window->set_status(bw->window, bw->status.text);
+	gui_window_set_status(bw->window, bw->status.text);
 }
 
 
@@ -4231,7 +4231,7 @@ void browser_window_set_pointer(struct browser_window *bw,
 		gui_shape = (gui_pointer_shape)shape;
 	}
 
-	guit->window->set_pointer(root->window, gui_shape);
+	gui_window_set_pointer(root->window, gui_shape);
 }
 
 
@@ -4493,11 +4493,11 @@ void browser_window_page_drag_start(struct browser_window *bw, int x, int y)
 
 	if (bw->window != NULL) {
 		/* Front end window */
-		guit->window->get_scroll(bw->window,
+		gui_window_get_scroll(bw->window,
 					 &bw->drag.start_scroll_x,
 					 &bw->drag.start_scroll_y);
 
-		guit->window->event(bw->window, GW_EVENT_SCROLL_START);
+		gui_window_event(bw->window, GW_EVENT_SCROLL_START);
 	} else {
 		/* Core managed browser window */
 		bw->drag.start_scroll_x = scrollbar_get_offset(bw->scroll_x);
@@ -4609,7 +4609,7 @@ browser_window_console_log(struct browser_window *bw,
 		break;
 	}
 
-	guit->window->console_log(root->window, src, msg, msglen, flags);
+	gui_window_console_log(root->window, src, msg, msglen, flags);
 
 	return NSERROR_OK;
 }

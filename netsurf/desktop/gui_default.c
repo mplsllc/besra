@@ -43,6 +43,7 @@
 #include "netsurf/search.h"
 #include "netsurf/fetch.h"
 #include "netsurf/misc.h"
+#include "netsurf/window.h"
 
 /* utf8 -------------------------------------------------------------------- */
 
@@ -142,4 +143,38 @@ nserror gui_misc_login(struct nsurl *url, const char *realm,
 		void *cbpw)
 {
 	return NSERROR_NOT_IMPLEMENTED;
+}
+
+/* window -------------------------------------------------------------------
+ *
+ * The frontend implements the mandatory window ops and most optional ones;
+ * these remaining optional notifiers default to inert behaviour.
+ */
+
+bool gui_window_drag_start(struct gui_window *gw, gui_drag_type type,
+		const struct rect *rect)
+{
+	return true;
+}
+
+nserror gui_window_save_link(struct gui_window *gw, struct nsurl *url,
+		const char *title)
+{
+	return NSERROR_OK;
+}
+
+void gui_window_drag_save_object(struct gui_window *gw, struct hlcache_handle *c,
+		gui_save_type type)
+{
+}
+
+void gui_window_drag_save_selection(struct gui_window *gw, const char *selection)
+{
+}
+
+void gui_window_console_log(struct gui_window *gw,
+		browser_window_console_source src,
+		const char *msg, size_t msglen,
+		browser_window_console_flags flags)
+{
 }
