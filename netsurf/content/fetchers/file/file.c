@@ -150,7 +150,7 @@ fetch_file_setup(struct fetch *fetchh,
 	if (ctx == NULL)
 		return NULL;
 
-	ret = guit->file->nsurl_to_path(url, &ctx->path);
+	ret = gui_file_nsurl_to_path(url, &ctx->path);
 	if (ret != NSERROR_OK) {
 		free(ctx);
 		return NULL;
@@ -330,7 +330,7 @@ static void fetch_file_process_plain(struct fetch_file_context *ctx,
 
 	/* content type */
 	if (fetch_file_send_header(ctx, "Content-Type: %s", 
-				   guit->fetch->filetype(ctx->path))) {
+				   gui_fetch_filetype(ctx->path))) {
 		goto fetch_file_process_aborted;
 	}
 
@@ -413,7 +413,7 @@ fetch_file_process_aborted:
 
 	/* content type */
 	if (fetch_file_send_header(ctx, "Content-Type: %s", 
-				   guit->fetch->filetype(ctx->path))) {
+				   gui_fetch_filetype(ctx->path))) {
 		goto fetch_file_process_aborted;
 	}
 
@@ -576,7 +576,7 @@ process_dir_ent(struct fetch_file_context *ctx,
 		}
 	}
 
-	ret = guit->file->path_to_nsurl(urlpath, &url);
+	ret = gui_file_path_to_nsurl(urlpath, &url);
 	if (ret != NSERROR_OK) {
 		free(urlpath);
 		return ret;
@@ -588,7 +588,7 @@ process_dir_ent(struct fetch_file_context *ctx,
 				     false,
 				     url,
 				     ent->d_name,
-				     guit->fetch->filetype(urlpath),
+				     gui_fetch_filetype(urlpath),
 				     ent_stat.st_size,
 				     datebuf, timebuf,
 				     buffer, buffer_len);

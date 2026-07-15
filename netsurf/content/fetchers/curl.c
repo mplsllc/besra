@@ -976,7 +976,7 @@ fetch_curl_postdata_convert(CURL *chandle,
 				goto convert_failed;
 			}
 
-			ret = guit->file->basename(multipart->value, &leafname, NULL);
+			ret = gui_file_basename(multipart->value, &leafname, NULL);
 			if (ret != NSERROR_OK) {
 				goto convert_failed;
 			}
@@ -986,7 +986,7 @@ fetch_curl_postdata_convert(CURL *chandle,
 				goto convert_failed;
 			}
 
-			mimetype = guit->fetch->mimetype(multipart->value);
+			mimetype = gui_fetch_mimetype(multipart->value);
 			if (mimetype == NULL) {
 				mimetype=strdup("text/plain");
 			}
@@ -1049,7 +1049,7 @@ fetch_curl_postdata_convert(CURL *chandle,
 	for (; control; control = control->next) {
 		if (control->file) {
 			char *leafname = NULL;
-			ret = guit->file->basename(control->value, &leafname, NULL);
+			ret = gui_file_basename(control->value, &leafname, NULL);
 			if (ret != NSERROR_OK) {
 				continue;
 			}
@@ -1081,7 +1081,7 @@ fetch_curl_postdata_convert(CURL *chandle,
 					      "curl_formadd: %d (%s)", code,
 					      control->name);
 			} else {
-				char *mimetype = guit->fetch->mimetype(control->value);
+				char *mimetype = gui_fetch_mimetype(control->value);
 				code = curl_formadd(&post, &last,
 						    CURLFORM_COPYNAME, control->name,
 						    CURLFORM_FILE, control->rawfile,
@@ -1798,7 +1798,7 @@ static curl_socket_t fetch_curl_socket_open(void *clientp,
 	(void) clientp;
 	(void) purpose;
 
-	return (curl_socket_t) guit->fetch->socket_open(
+	return (curl_socket_t) gui_fetch_socket_open(
 			address->family, address->socktype,
 			address->protocol);
 }
@@ -1807,7 +1807,7 @@ static int fetch_curl_socket_close(void *clientp, curl_socket_t item)
 {
 	(void) clientp;
 
-	return guit->fetch->socket_close((int) item);
+	return gui_fetch_socket_close((int) item);
 }
 
 /**

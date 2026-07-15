@@ -33,11 +33,15 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "utils/errors.h"
+#include "utils/inet.h"
 #include "netsurf/utf8.h"
 #include "netsurf/search.h"
+#include "netsurf/fetch.h"
 
 /* utf8 -------------------------------------------------------------------- */
 
@@ -87,4 +91,32 @@ void gui_search_hourglass(bool active, void *p)
 
 void gui_search_add_recent(const char *string, void *p)
 {
+}
+
+/* fetch --------------------------------------------------------------------
+ *
+ * The frontend implements filetype and the resource-fetcher hooks; the
+ * remaining entries default to generic behaviour (resource data released by
+ * the resource fetcher itself, mimetype from filetype, and the platform
+ * socket calls).
+ */
+
+nserror gui_fetch_release_resource_data(const uint8_t *data)
+{
+	return NSERROR_OK;
+}
+
+char *gui_fetch_mimetype(const char *ro_path)
+{
+	return strdup(gui_fetch_filetype(ro_path));
+}
+
+int gui_fetch_socket_open(int domain, int type, int protocol)
+{
+	return (int)socket(domain, type, protocol);
+}
+
+int gui_fetch_socket_close(int socket)
+{
+	return (int)ns_close_socket(socket);
 }

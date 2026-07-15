@@ -1186,7 +1186,6 @@ int main(int argc, char** argv)
 		.misc = nsgtk_misc_table,
 		.window = nsgtk_window_table,
 		.corewindow = nsgtk_core_window_table,
-		.fetch = nsgtk_fetch_table,
 		.llcache = filesystem_llcache_table,
 		.bitmap = nsgtk_bitmap_table,
 		.layout = nsgtk_layout_table,

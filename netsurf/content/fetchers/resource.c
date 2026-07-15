@@ -180,7 +180,7 @@ static bool fetch_resource_data_handler(struct fetch_resource_context *ctx)
 
 	/* content type */
 	if (fetch_resource_send_header(ctx, "Content-Type: %s",
-				       guit->fetch->filetype(lwc_string_data(ctx->entry->path)))) {
+				       gui_fetch_filetype(lwc_string_data(ctx->entry->path)))) {
 		goto fetch_resource_data_aborted;
 	}
 
@@ -289,7 +289,7 @@ static bool fetch_resource_initialise(lwc_string *scheme)
 		}
 
 		e->data = NULL;
-		res = guit->fetch->get_resource_data(lwc_string_data(e->path),
+		res = gui_fetch_get_resource_data(lwc_string_data(e->path),
 						     &e->data,
 						     &e->data_len);
 		if (res == NSERROR_OK) {
@@ -297,7 +297,7 @@ static bool fetch_resource_initialise(lwc_string *scheme)
 			      fetch_resource_paths[i]);
 			fetch_resource_path_count++;
 		} else {
-			e->redirect_url = guit->fetch->get_resource_url(fetch_resource_paths[i]);
+			e->redirect_url = gui_fetch_get_resource_url(fetch_resource_paths[i]);
 			if (e->redirect_url == NULL) {
 				lwc_string_unref(e->path);
 			} else {
@@ -319,7 +319,7 @@ static void fetch_resource_finalise(lwc_string *scheme)
 	for (i = 0; i < fetch_resource_path_count; i++) {
 		lwc_string_unref(fetch_resource_map[i].path);
 		if (fetch_resource_map[i].data != NULL) {
-			guit->fetch->release_resource_data(fetch_resource_map[i].data);
+			gui_fetch_release_resource_data(fetch_resource_map[i].data);
 		} else {
 			nsurl_unref(fetch_resource_map[i].redirect_url);
 		}

@@ -181,7 +181,7 @@ void gtk_fetch_filetype_fin(void)
 	hash_destroy(mime_hash);
 }
 
-const char *fetch_filetype(const char *unix_path)
+const char *gui_fetch_filetype(const char *unix_path)
 {
 	struct stat statbuf;
 	char *ext;
@@ -248,7 +248,7 @@ const char *fetch_filetype(const char *unix_path)
 }
 
 
-static nsurl *nsgtk_get_resource_url(const char *path)
+nsurl *gui_fetch_get_resource_url(const char *path)
 {
 	char buf[PATH_MAX];
 	nsurl *url = NULL;
@@ -263,11 +263,10 @@ static nsurl *nsgtk_get_resource_url(const char *path)
 	return url;
 }
 
-static struct gui_fetch_table fetch_table = {
-	.filetype = fetch_filetype,
 
-	.get_resource_url = nsgtk_get_resource_url,
-	.get_resource_data = nsgtk_data_from_resname,
-};
-
-struct gui_fetch_table *nsgtk_fetch_table = &fetch_table;
+/* gui_fetch_get_resource_data adapts gtk's multi-use resource loader
+ * (nsgtk_data_from_resname) to the core fetch contract. */
+nserror gui_fetch_get_resource_data(const char *path, const uint8_t **data, size_t *data_len)
+{
+	return nsgtk_data_from_resname(path, data, data_len);
+}

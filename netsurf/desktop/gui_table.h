@@ -29,8 +29,6 @@
 
 struct gui_misc_table;
 struct gui_window_table;
-struct gui_fetch_table;
-struct gui_file_table;
 struct gui_llcache_table;
 struct gui_bitmap_table;
 struct gui_layout_table;
@@ -68,23 +66,6 @@ struct netsurf_table {
 	 * The table is optional and may be NULL which does nothing.
 	 */
 	struct core_window_table *corewindow;
-
-	/**
-	 * Fetcher table
-	 *
-	 * The table is mandantory and must be provided.
-	 */
-	struct gui_fetch_table *fetch;
-
-	/**
-	 * File table
-	 *
-	 * Provides file and filename operations to the core.
-	 *
-	 * The table is optional and may be NULL in which case the
-	 * default posix compliant operations will be used.
-	 */
-	struct gui_file_table *file;
 
 	/**
 	 * Low level cache table.

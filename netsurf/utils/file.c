@@ -58,7 +58,7 @@
  * @return NSERROR_OK and the complete path is written to str
  *         or error code on faliure.
  */
-static nserror posix_vmkpath(char **str, size_t *size, size_t nelm, va_list ap)
+nserror gui_file_mkpath(char **str, size_t *size, size_t nelm, va_list ap)
 {
 	return vsnstrjoin(str, size, '/', nelm, ap);
 }
@@ -77,7 +77,7 @@ static nserror posix_vmkpath(char **str, size_t *size, size_t nelm, va_list ap)
  * @return NSERROR_OK and the complete path is written to str
  *         or error code on faliure.
  */
-static nserror posix_basename(const char *path, char **str, size_t *size)
+nserror gui_file_basename(const char *path, char **str, size_t *size)
 {
 	const char *leafname;
 	char *fname;
@@ -114,7 +114,7 @@ static nserror posix_basename(const char *path, char **str, size_t *size)
  * @return NSERROR_OK and the path is written to \a path or error code
  *         on faliure.
  */
-static nserror posix_nsurl_to_path(struct nsurl *url, char **path_out)
+nserror gui_file_nsurl_to_path(struct nsurl *url, char **path_out)
 {
 	lwc_string *urlpath;
 	char *path;
@@ -168,7 +168,7 @@ static nserror posix_nsurl_to_path(struct nsurl *url, char **path_out)
  * @return NSERROR_OK and the url is placed in \a url or error code on
  *         faliure.
  */
-static nserror posix_path_to_nsurl(const char *path, struct nsurl **url_out)
+nserror gui_file_path_to_nsurl(const char *path, struct nsurl **url_out)
 {
 	nserror ret;
 	int urllen;
@@ -214,7 +214,7 @@ static nserror posix_path_to_nsurl(const char *path, struct nsurl **url_out)
  * @param fname The filename to ensure the path to exists.
  * @return NSERROR_OK on success or error code on failure.
  */
-static nserror posix_mkdir_all(const char *fname)
+nserror gui_file_mkdir_all(const char *fname)
 {
 	char *dname;
 	char *sep;
@@ -274,16 +274,6 @@ static nserror posix_mkdir_all(const char *fname)
 /**
  * default to using the posix file handling
  */
-static struct gui_file_table file_table = {
-	.mkpath = posix_vmkpath,
-	.basename = posix_basename,
-	.nsurl_to_path = posix_nsurl_to_path,
-	.path_to_nsurl = posix_path_to_nsurl,
-	.mkdir_all = posix_mkdir_all,
-};
-
-struct gui_file_table *default_file_table = &file_table;
-
 /* exported interface documented in utils/file.h */
 nserror netsurf_mkpath(char **str, size_t *size, size_t nelm, ...)
 {
@@ -291,7 +281,7 @@ nserror netsurf_mkpath(char **str, size_t *size, size_t nelm, ...)
 	nserror ret;
 
 	va_start(ap, nelm);
-	ret = guit->file->mkpath(str, size, nelm, ap);
+	ret = gui_file_mkpath(str, size, nelm, ap);
 	va_end(ap);
 
 	return ret;
@@ -300,19 +290,19 @@ nserror netsurf_mkpath(char **str, size_t *size, size_t nelm, ...)
 /* exported interface documented in utils/file.h */
 nserror netsurf_nsurl_to_path(struct nsurl *url, char **path_out)
 {
-	return guit->file->nsurl_to_path(url, path_out);
+	return gui_file_nsurl_to_path(url, path_out);
 }
 
 /* exported interface documented in utils/file.h */
 nserror netsurf_path_to_nsurl(const char *path, struct nsurl **url)
 {
-	return guit->file->path_to_nsurl(path, url);
+	return gui_file_path_to_nsurl(path, url);
 }
 
 /* exported interface documented in utils/file.h */
 nserror netsurf_mkdir_all(const char *fname)
 {
-	return guit->file->mkdir_all(fname);
+	return gui_file_mkdir_all(fname);
 }
 
 /* exported interface documented in utils/file.h */
