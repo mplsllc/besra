@@ -1638,7 +1638,7 @@ static void html__set_file_gadget_filename(struct content *c,
 	html_content *html = (html_content *)c;
 	struct box *file_box = gadget->box;
 
-	ret = guit->utf8->local_to_utf8(fn, 0, &utf8_fn);
+	ret = gui_utf8_local_to_utf8(fn, 0, &utf8_fn);
 	if (ret != NSERROR_OK) {
 		assert(ret != NSERROR_BAD_ENCODING);
 		NSLOG(netsurf, INFO,
@@ -1797,7 +1797,7 @@ static bool html_drop_file_at_point(struct content *c, int x, int y, char *file)
 		/* TODO: Sniff for text? */
 
 		/* Convert to UTF-8 */
-		ret = guit->utf8->local_to_utf8(buffer, file_len, &utf8_buff);
+		ret = gui_utf8_local_to_utf8(buffer, file_len, &utf8_buff);
 		if (ret != NSERROR_OK) {
 			/* bad encoding shouldn't happen */
 			NSLOG(netsurf, ERROR,

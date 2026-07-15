@@ -15,6 +15,6 @@ desktop/version.c: testament $(OBJROOT)/testament.h
 S_BROWSER := bitmap.c browser.c browser_window.c browser_history.c \
 	download.c frames.c netsurf.c cw_helper.c \
 	save_complete.c save_text.c selection.c textinput.c gui_factory.c \
-	save_pdf.c font_haru.c
+	gui_default.c save_pdf.c font_haru.c
 
 S_BROWSER := $(addprefix desktop/,$(S_BROWSER))

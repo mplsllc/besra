@@ -502,7 +502,7 @@ bool selection_copy_to_clipboard(struct selection *s)
 		return false;
 	}
 
-	guit->clipboard->set(sel_string.buffer,
+	gui_clipboard_set(sel_string.buffer,
 			     sel_string.length,
 			     sel_string.styles,
 			     sel_string.n_styles);

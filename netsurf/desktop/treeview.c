@@ -3509,7 +3509,7 @@ static void treeview_copy_selection(treeview *tree)
 	}
 
 	if (sw.data.copy.text != NULL) {
-		guit->clipboard->set(sw.data.copy.text,
+		gui_clipboard_set(sw.data.copy.text,
 				     sw.data.copy.len - 1, NULL, 0);
 		free(sw.data.copy.text);
 	}

@@ -30,10 +30,8 @@
 struct gui_misc_table;
 struct gui_window_table;
 struct gui_download_table;
-struct gui_clipboard_table;
 struct gui_fetch_table;
 struct gui_file_table;
-struct gui_utf8_table;
 struct gui_search_table;
 struct gui_search_web_table;
 struct gui_llcache_table;
@@ -82,11 +80,6 @@ struct netsurf_table {
 	struct gui_download_table *download;
 
 	/**
-	 * Clipboard table.
-	 */
-	struct gui_clipboard_table *clipboard;
-
-	/**
 	 * Fetcher table
 	 *
 	 * The table is mandantory and must be provided.
@@ -102,17 +95,6 @@ struct netsurf_table {
 	 * default posix compliant operations will be used.
 	 */
 	struct gui_file_table *file;
-
-	/**
-	 * UTF8 table.
-	 *
-	 * Provides for conversion between the gui local character
-	 * encoding and utf8.
-	 *
-	 * The table optional and may be NULL which implies the local
-	 * encoding is utf8.
-	 */
-	struct gui_utf8_table *utf8;
 
 	/**
 	 * Page search table.

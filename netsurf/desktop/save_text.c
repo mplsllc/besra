@@ -71,7 +71,7 @@ void save_as_text(struct hlcache_handle *c, char *path)
 	if (!save.block)
 		return;
 
-	ret = guit->utf8->utf8_to_local(save.block, save.length, &result);
+	ret = gui_utf8_utf8_to_local(save.block, save.length, &result);
 	free(save.block);
 
 	if (ret != NSERROR_OK) {

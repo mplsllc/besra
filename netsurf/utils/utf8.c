@@ -470,7 +470,7 @@ bool utf8_save_text(const char *utf8_text, const char *path)
 	char *conv;
 	FILE *out;
 
-	ret = guit->utf8->utf8_to_local(utf8_text, strlen(utf8_text), &conv);
+	ret = gui_utf8_utf8_to_local(utf8_text, strlen(utf8_text), &conv);
 	if (ret != NSERROR_OK) {
 		NSLOG(netsurf, INFO,
 		      "failed to convert to local encoding, return %d", ret);
