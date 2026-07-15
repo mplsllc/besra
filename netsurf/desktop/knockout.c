@@ -887,7 +887,7 @@ knockout_plot_bitmap(const struct redraw_context *ctx,
 	}
 
 	/* tiled bitmaps both knock out and get knocked out */
-	if (guit->bitmap->get_opaque(bitmap)) {
+	if (gui_bitmap_get_opaque(bitmap)) {
 		knockout_calculate(ctx, kx0, ky0, kx1, ky1, NULL);
 	}
 	knockout_boxes[knockout_box_cur].bbox.x0 = kx0;

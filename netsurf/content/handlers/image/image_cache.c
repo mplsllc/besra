@@ -263,7 +263,7 @@ static void image_cache__free_bitmap(struct image_cache_entry_s *centry)
 		      image_cache->current_age - centry->bitmap_age,
 		      centry->redraw_count);
 #endif
-		guit->bitmap->destroy(centry->bitmap);
+		gui_bitmap_destroy(centry->bitmap);
 		centry->bitmap = NULL;
 		image_cache->total_bitmap_size -= centry->bitmap_size;
 		image_cache->bitmap_count--;
@@ -539,7 +539,7 @@ nserror image_cache_add(struct content *content,
 	/* set bitmap entry if one is passed, free extant one if present */
 	if (bitmap != NULL) {
 		if (centry->bitmap != NULL) {
-			guit->bitmap->destroy(centry->bitmap);
+			gui_bitmap_destroy(centry->bitmap);
 		} else {
 			image_cache_stats_bitmap_add(centry);
 		}
@@ -864,7 +864,7 @@ bool image_cache_is_opaque(struct content *c)
 	struct bitmap *bmp;
 	bmp = image_cache_get_bitmap(c);
 	if (bmp != NULL) {
-		return guit->bitmap->get_opaque(bmp);
+		return gui_bitmap_get_opaque(bmp);
 	}
 	return false;
 }

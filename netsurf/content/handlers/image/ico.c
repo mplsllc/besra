@@ -63,15 +63,15 @@ static void *nsico_bitmap_create(int width, int height, unsigned int bmp_state)
 			BITMAP_CLEAR : 0;
 
 	/* return the created bitmap */
-	return guit->bitmap->create(width, height, bitmap_state);
+	return gui_bitmap_create(width, height, bitmap_state);
 }
 
 static nserror nsico_create_ico_data(nsico_content *c)
 {
 	bmp_bitmap_callback_vt bmp_bitmap_callbacks = {
 		.bitmap_create = nsico_bitmap_create,
-		.bitmap_destroy = guit->bitmap->destroy,
-		.bitmap_get_buffer = guit->bitmap->get_buffer,
+		.bitmap_destroy = gui_bitmap_destroy,
+		.bitmap_get_buffer = gui_bitmap_get_buffer,
 	};
 
 	c->ico = calloc(1, sizeof(ico_collection));
@@ -184,7 +184,7 @@ static bool nsico__decode(struct bmp_image *ico)
 		bitmap_format_to_client(ico->bitmap, &(bitmap_fmt_t) {
 			.layout = BITMAP_LAYOUT_R8G8B8A8,
 		});
-		guit->bitmap->modified(ico->bitmap);
+		gui_bitmap_modified(ico->bitmap);
 
 	}
 
@@ -303,7 +303,7 @@ static bool nsico_is_opaque(struct content *c)
 		return false;
 	}
 
-	return guit->bitmap->get_opaque(bmp->bitmap);
+	return gui_bitmap_get_opaque(bmp->bitmap);
 }
 
 static const content_handler nsico_content_handler = {

@@ -126,15 +126,15 @@ bool image_bitmap_plot(struct bitmap *bitmap,
 	plot_style_t fill_style;
 	struct rect area;
 
-	width = guit->bitmap->get_width(bitmap);
+	width = gui_bitmap_get_width(bitmap);
 	if (width == 1) {
-		height = guit->bitmap->get_height(bitmap);
+		height = gui_bitmap_get_height(bitmap);
 		if (height == 1) {
 			/* optimise 1x1 bitmap plot */
-			pixel = guit->bitmap->get_buffer(bitmap);
+			pixel = gui_bitmap_get_buffer(bitmap);
 			fill_style.fill_colour = bitmap_pixel_to_colour(pixel);
 
-			if (guit->bitmap->get_opaque(bitmap) ||
+			if (gui_bitmap_get_opaque(bitmap) ||
 			    ((fill_style.fill_colour & 0xff000000) == 0xff000000)) {
 
 				area = *clip;

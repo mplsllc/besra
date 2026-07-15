@@ -119,12 +119,12 @@ static bool nssprite_convert(struct content *c)
 
 	struct rosprite* sprite = sprite_area->sprites[0];
 
-	nssprite->bitmap = guit->bitmap->create(sprite->width, sprite->height, BITMAP_NONE);
+	nssprite->bitmap = gui_bitmap_create(sprite->width, sprite->height, BITMAP_NONE);
 	if (!nssprite->bitmap) {
 		content_broadcast_error(c, NSERROR_NOMEM, NULL);
 		return false;
 	}
-	uint32_t* imagebuf = (uint32_t *)(void *)guit->bitmap->get_buffer(nssprite->bitmap);
+	uint32_t* imagebuf = (uint32_t *)(void *)gui_bitmap_get_buffer(nssprite->bitmap);
 	if (!imagebuf) {
 		content_broadcast_error(c, NSERROR_NOMEM, NULL);
 		return false;
@@ -148,7 +148,7 @@ static bool nssprite_convert(struct content *c)
 	bitmap_format_to_client(nssprite->bitmap, &(bitmap_fmt_t) {
 		.layout = BITMAP_LAYOUT_A8B8G8R8,
 	});
-	guit->bitmap->modified(nssprite->bitmap);
+	gui_bitmap_modified(nssprite->bitmap);
 
 	content_set_ready(c);
 	content_set_done(c);
@@ -177,7 +177,7 @@ static void nssprite_destroy(struct content *c)
 	if (nssprite->sprite_area != NULL)
 		rosprite_destroy_sprite_area(nssprite->sprite_area);
 	if (nssprite->bitmap != NULL)
-		guit->bitmap->destroy(nssprite->bitmap);
+		gui_bitmap_destroy(nssprite->bitmap);
 }
 
 
@@ -257,7 +257,7 @@ static bool nssprite_content_is_opaque(struct content *c)
 	nssprite_content *nssprite = (nssprite_content *) c;
 
 	if (nssprite->bitmap != NULL) {
-		return guit->bitmap->get_opaque(nssprite->bitmap);
+		return gui_bitmap_get_opaque(nssprite->bitmap);
 	}
 
 	return false;

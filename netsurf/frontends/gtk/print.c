@@ -600,8 +600,8 @@ nsgtk_print_plot_bitmap(const struct redraw_context *ctx,
 		return nsgtk_print_plot_pixbuf(x, y, width, height, bitmap, bg);
 	}
 
-	width = nsgtk_bitmap_get_width(bitmap);
-	height = nsgtk_bitmap_get_height(bitmap);
+	width = gui_bitmap_get_width(bitmap);
+	height = gui_bitmap_get_height(bitmap);
 
 	/* Bail early if we can */
 	if (width == 0 || height == 0)

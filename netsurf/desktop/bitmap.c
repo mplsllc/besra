@@ -279,11 +279,11 @@ void bitmap_format_convert(void *bitmap,
 		const bitmap_fmt_t *fmt_from,
 		const bitmap_fmt_t *fmt_to)
 {
-	int width = guit->bitmap->get_width(bitmap);
-	int height = guit->bitmap->get_height(bitmap);
-	bool opaque = guit->bitmap->get_opaque(bitmap);
-	uint8_t *buffer = guit->bitmap->get_buffer(bitmap);
-	size_t rowstride = guit->bitmap->get_rowstride(bitmap);
+	int width = gui_bitmap_get_width(bitmap);
+	int height = gui_bitmap_get_height(bitmap);
+	bool opaque = gui_bitmap_get_opaque(bitmap);
+	uint8_t *buffer = gui_bitmap_get_buffer(bitmap);
+	size_t rowstride = gui_bitmap_get_rowstride(bitmap);
 	struct bitmap_colour_layout to = bitmap__get_colour_layout(fmt_to);
 	struct bitmap_colour_layout from = bitmap__get_colour_layout(fmt_from);
 
@@ -315,10 +315,10 @@ void bitmap_format_convert(void *bitmap,
 /* Exported function, documented in desktop/bitmap.h */
 bool bitmap_test_opaque(void *bitmap)
 {
-	int width = guit->bitmap->get_width(bitmap);
-	int height = guit->bitmap->get_height(bitmap);
-	size_t rowstride = guit->bitmap->get_rowstride(bitmap);
-	const uint8_t *buffer = guit->bitmap->get_buffer(bitmap);
+	int width = gui_bitmap_get_width(bitmap);
+	int height = gui_bitmap_get_height(bitmap);
+	size_t rowstride = gui_bitmap_get_rowstride(bitmap);
+	const uint8_t *buffer = gui_bitmap_get_buffer(bitmap);
 
 	width *= sizeof(uint32_t);
 

@@ -152,7 +152,7 @@ static bool rsvg_convert(struct content *c)
 	c->width = rsvgsize.width;
 	c->height = rsvgsize.height;
 
-	if ((d->bitmap = guit->bitmap->create(c->width, c->height,
+	if ((d->bitmap = gui_bitmap_create(c->width, c->height,
 			BITMAP_NONE)) == NULL) {
 		NSLOG(netsurf, INFO,
 		      "Failed to create bitmap for rsvg render.");
@@ -161,10 +161,10 @@ static bool rsvg_convert(struct content *c)
 	}
 
 	if ((d->cs = cairo_image_surface_create_for_data(
-			(unsigned char *)guit->bitmap->get_buffer(d->bitmap),
+			(unsigned char *)gui_bitmap_get_buffer(d->bitmap),
 			CAIRO_FORMAT_ARGB32,
 			c->width, c->height,
-			guit->bitmap->get_rowstride(d->bitmap))) == NULL) {
+			gui_bitmap_get_rowstride(d->bitmap))) == NULL) {
 		NSLOG(netsurf, INFO,
 		      "Failed to create Cairo image surface for rsvg render.");
 		content_broadcast_error(c, NSERROR_NOMEM, NULL);
@@ -183,7 +183,7 @@ static bool rsvg_convert(struct content *c)
 	bitmap_format_to_client(d->bitmap, &(bitmap_fmt_t) {
 		.layout = BITMAP_LAYOUT_ARGB8888,
 	});
-	guit->bitmap->modified(d->bitmap);
+	gui_bitmap_modified(d->bitmap);
 	content_set_ready(c);
 	content_set_done(c);
 	/* Done: update status bar */
@@ -217,7 +217,7 @@ static void rsvg_destroy(struct content *c)
 {
 	rsvg_content *d = (rsvg_content *) c;
 
-	if (d->bitmap != NULL) guit->bitmap->destroy(d->bitmap);
+	if (d->bitmap != NULL) gui_bitmap_destroy(d->bitmap);
 	if (d->rsvgh != NULL) g_object_unref(d->rsvgh);
 	if (d->ct != NULL) cairo_destroy(d->ct);
 	if (d->cs != NULL) cairo_surface_destroy(d->cs);
@@ -288,7 +288,7 @@ static bool rsvg_content_is_opaque(struct content *c)
 	rsvg_content *d = (rsvg_content *) c;
 
 	if (d->bitmap != NULL) {
-		return guit->bitmap->get_opaque(d->bitmap);
+		return gui_bitmap_get_opaque(d->bitmap);
 	}
 
 	return false;

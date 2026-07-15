@@ -155,9 +155,9 @@ jpegxl_cache_convert(struct content *c)
 
 	/* create bitmap with appropriate opacity */
 	if (binfo.alpha_bits > 0) {
-		bitmap = guit->bitmap->create(c->width, c->height, BITMAP_OPAQUE);
+		bitmap = gui_bitmap_create(c->width, c->height, BITMAP_OPAQUE);
 	} else {
-		bitmap = guit->bitmap->create(c->width, c->height, BITMAP_NONE);
+		bitmap = gui_bitmap_create(c->width, c->height, BITMAP_NONE);
 	}
 	if (bitmap == NULL) {
 		/* empty bitmap could not be created */
@@ -166,17 +166,17 @@ jpegxl_cache_convert(struct content *c)
 	}
 
 	/* ensure buffer was allocated */
-	output = guit->bitmap->get_buffer(bitmap);
+	output = gui_bitmap_get_buffer(bitmap);
 	if (output == NULL) {
 		/* bitmap with no buffer available */
-		guit->bitmap->destroy(bitmap);
+		gui_bitmap_destroy(bitmap);
 		JxlDecoderDestroy(jxldec);
 		return NULL;
 	}
 	decstatus = JxlDecoderSetImageOutBuffer(jxldec, &jxl_output_format, output, c->size);
 	if (decstatus != JXL_DEC_SUCCESS) {
 		NSLOG(netsurf, ERROR, "unable to set output buffer callback status:%d",decstatus);
-		guit->bitmap->destroy(bitmap);
+		gui_bitmap_destroy(bitmap);
 		JxlDecoderDestroy(jxldec);
 		return NULL;
 	}
@@ -184,7 +184,7 @@ jpegxl_cache_convert(struct content *c)
 	decstatus = JxlDecoderProcessInput(jxldec);
 	if (decstatus != JXL_DEC_FULL_IMAGE) {
 		NSLOG(netsurf, ERROR, "did not get decode event");
-		guit->bitmap->destroy(bitmap);
+		gui_bitmap_destroy(bitmap);
 		JxlDecoderDestroy(jxldec);
 		return NULL;
 	}
@@ -192,7 +192,7 @@ jpegxl_cache_convert(struct content *c)
 	JxlDecoderDestroy(jxldec);
 
 	bitmap_format_to_client(bitmap, &jxl_fmt);
-	guit->bitmap->modified(bitmap);
+	gui_bitmap_modified(bitmap);
 
 	return bitmap;
 }

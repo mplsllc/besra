@@ -88,7 +88,7 @@ static inline nserror gif__nsgif_error_to_ns(nsgif_error gif_res)
  */
 static void *gif_bitmap_create(int width, int height)
 {
-	return guit->bitmap->create(width, height, BITMAP_NONE);
+	return gui_bitmap_create(width, height, BITMAP_NONE);
 }
 
 /**
@@ -113,11 +113,11 @@ static nserror gif_create_gif_data(gif_content *c)
 	nsgif_error gif_res;
 	const nsgif_bitmap_cb_vt gif_bitmap_callbacks = {
 		.create = gif_bitmap_create,
-		.destroy = guit->bitmap->destroy,
-		.get_buffer = guit->bitmap->get_buffer,
-		.set_opaque = guit->bitmap->set_opaque,
+		.destroy = gui_bitmap_destroy,
+		.get_buffer = gui_bitmap_get_buffer,
+		.set_opaque = gui_bitmap_set_opaque,
 		.test_opaque = bitmap_test_opaque,
-		.modified = guit->bitmap->modified,
+		.modified = gui_bitmap_modified,
 	};
 
 	gif_res = nsgif_create(&gif_bitmap_callbacks,
@@ -404,7 +404,7 @@ static bool gif_content_is_opaque(struct content *c)
 		return false;
 	}
 
-	return guit->bitmap->get_opaque(bitmap);
+	return gui_bitmap_get_opaque(bitmap);
 }
 
 static const content_handler gif_content_handler = {

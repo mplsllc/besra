@@ -104,25 +104,25 @@ rsvg_cache_convert(struct content *c)
 	RsvgRectangle viewport;
 	gboolean renderres;
 
-	if ((bitmap = guit->bitmap->create(c->width, c->height,	BITMAP_NONE)) == NULL) {
+	if ((bitmap = gui_bitmap_create(c->width, c->height,	BITMAP_NONE)) == NULL) {
 		NSLOG(netsurf, INFO, "Failed to create bitmap for rsvg render.");
 		return NULL;
 	}
 
 	if ((cs = cairo_image_surface_create_for_data(
-		     (unsigned char *)guit->bitmap->get_buffer(bitmap),
+		     (unsigned char *)gui_bitmap_get_buffer(bitmap),
 		     CAIRO_FORMAT_ARGB32,
 		     c->width, c->height,
-		     guit->bitmap->get_rowstride(bitmap))) == NULL) {
+		     gui_bitmap_get_rowstride(bitmap))) == NULL) {
 		NSLOG(netsurf, INFO, "Failed to create Cairo image surface for rsvg render.");
-		guit->bitmap->destroy(bitmap);
+		gui_bitmap_destroy(bitmap);
 		return NULL;
 	}
 	if ((cr = cairo_create(cs)) == NULL) {
 		NSLOG(netsurf, INFO,
 		      "Failed to create Cairo drawing context for rsvg render.");
 		cairo_surface_destroy(cs);
-		guit->bitmap->destroy(bitmap);
+		gui_bitmap_destroy(bitmap);
 		return NULL;
 	}
 
@@ -136,7 +136,7 @@ rsvg_cache_convert(struct content *c)
 	bitmap_format_to_client(bitmap, &(bitmap_fmt_t) {
 			.layout = BITMAP_LAYOUT_ARGB8888,
 		});
-	guit->bitmap->modified(bitmap);
+	gui_bitmap_modified(bitmap);
 
 	cairo_destroy(cr);
 	cairo_surface_destroy(cs);

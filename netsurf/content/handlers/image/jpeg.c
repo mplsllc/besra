@@ -338,7 +338,7 @@ jpeg_cache_convert(struct content *c)
 	jpeg_start_decompress(&cinfo);
 
 	/* create opaque bitmap (jpegs cannot be transparent) */
-	bitmap = guit->bitmap->create(
+	bitmap = gui_bitmap_create(
 			cinfo.output_width,
 			cinfo.output_height, BITMAP_OPAQUE);
 	if (bitmap == NULL) {
@@ -347,16 +347,16 @@ jpeg_cache_convert(struct content *c)
 		return NULL;
 	}
 
-	pixels = guit->bitmap->get_buffer(bitmap);
+	pixels = gui_bitmap_get_buffer(bitmap);
 	if (pixels == NULL) {
 		/* bitmap with no buffer available */
-		guit->bitmap->destroy(bitmap);
+		gui_bitmap_destroy(bitmap);
 		jpeg_destroy_decompress(&cinfo);
 		return NULL;
 	}
 
 	/* Convert scanlines from jpeg into bitmap */
-	rowstride = guit->bitmap->get_rowstride(bitmap);
+	rowstride = gui_bitmap_get_rowstride(bitmap);
 
 	switch (cinfo.out_color_space) {
 	case JCS_CMYK:
@@ -372,7 +372,7 @@ jpeg_cache_convert(struct content *c)
 		break;
 	}
 
-	guit->bitmap->modified(bitmap);
+	gui_bitmap_modified(bitmap);
 
 	jpeg_finish_decompress(&cinfo);
 	jpeg_destroy_decompress(&cinfo);

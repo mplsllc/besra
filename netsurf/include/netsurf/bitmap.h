@@ -119,93 +119,91 @@ void bitmap_set_format(const bitmap_fmt_t *bitmap_format);
  */
 bool bitmap_test_opaque(void *bitmap);
 
-/**
- * Bitmap operations.
+/*
+ * Bitmap operations, implemented by the frontend. These wrap the native
+ * platform-specific image format for the image convertors.
  */
-struct gui_bitmap_table {
-	/* Mandatory entries */
 
-	/**
-	 * Create a new bitmap.
-	 *
-	 * \param width   width of image in pixels
-	 * \param height  height of image in pixels
-	 * \param flags   flags for bitmap creation
-	 * \return A bitmap structure or NULL on error.
-	 */
-	void *(*create)(int width, int height, enum gui_bitmap_flags flags);
+/**
+ * Create a new bitmap.
+ *
+ * \param width   width of image in pixels
+ * \param height  height of image in pixels
+ * \param flags   flags for bitmap creation
+ * \return A bitmap structure or NULL on error.
+ */
+void *gui_bitmap_create(int width, int height, enum gui_bitmap_flags flags);
 
-	/**
-	 * Destroy a bitmap.
-	 *
-	 * \param bitmap The bitmap to destroy.
-	 */
-	void (*destroy)(void *bitmap);
+/**
+ * Destroy a bitmap.
+ *
+ * \param bitmap The bitmap to destroy.
+ */
+void gui_bitmap_destroy(void *bitmap);
 
-	/**
-	 * Set the opacity of a bitmap.
-	 *
-	 * \param bitmap The bitmap to set opacity on.
-	 * \param opaque The bitmap opacity to set.
-	 */
-	void (*set_opaque)(void *bitmap, bool opaque);
+/**
+ * Set the opacity of a bitmap.
+ *
+ * \param bitmap The bitmap to set opacity on.
+ * \param opaque The bitmap opacity to set.
+ */
+void gui_bitmap_set_opaque(void *bitmap, bool opaque);
 
-	/**
-	 * Get the opacity of a bitmap.
-	 *
-	 * \param bitmap The bitmap to examine.
-	 * \return The bitmap opacity.
-	 */
-	bool (*get_opaque)(void *bitmap);
+/**
+ * Get the opacity of a bitmap.
+ *
+ * \param bitmap The bitmap to examine.
+ * \return The bitmap opacity.
+ */
+bool gui_bitmap_get_opaque(void *bitmap);
 
-	/**
-	 * Get the image buffer from a bitmap
-	 *
-	 * Note that all pixels must be 4-byte aligned.
-	 *
-	 * \param bitmap The bitmap to get the buffer from.
-	 * \return The image buffer or NULL if there is none.
-	 */
-	unsigned char *(*get_buffer)(void *bitmap);
+/**
+ * Get the image buffer from a bitmap
+ *
+ * Note that all pixels must be 4-byte aligned.
+ *
+ * \param bitmap The bitmap to get the buffer from.
+ * \return The image buffer or NULL if there is none.
+ */
+unsigned char *gui_bitmap_get_buffer(void *bitmap);
 
-	/**
-	 * Get the number of bytes per row of the image
-	 *
-	 * \param bitmap The bitmap
-	 * \return The number of bytes for a row of the bitmap.
-	 */
-	size_t (*get_rowstride)(void *bitmap);
+/**
+ * Get the number of bytes per row of the image
+ *
+ * \param bitmap The bitmap
+ * \return The number of bytes for a row of the bitmap.
+ */
+size_t gui_bitmap_get_rowstride(void *bitmap);
 
-	/**
-	 * Get the bitmap width
-	 *
-	 * \param bitmap The bitmap
-	 * \return The bitmap width in pixels.
-	 */
-	int (*get_width)(void *bitmap);
+/**
+ * Get the bitmap width
+ *
+ * \param bitmap The bitmap
+ * \return The bitmap width in pixels.
+ */
+int gui_bitmap_get_width(void *bitmap);
 
-	/**
-	 * Get the bitmap height
-	 *
-	 * \param bitmap The bitmap
-	 * \return The bitmap height in pixels.
-	 */
-	int (*get_height)(void *bitmap);
+/**
+ * Get the bitmap height
+ *
+ * \param bitmap The bitmap
+ * \return The bitmap height in pixels.
+ */
+int gui_bitmap_get_height(void *bitmap);
 
-	/**
-	 * Marks a bitmap as modified.
-	 *
-	 * \param bitmap The bitmap set as modified.
-	 */
-	void (*modified)(void *bitmap);
+/**
+ * Marks a bitmap as modified.
+ *
+ * \param bitmap The bitmap set as modified.
+ */
+void gui_bitmap_modified(void *bitmap);
 
-	/**
-	 * Render content into a bitmap.
-	 *
-	 * \param bitmap The bitmap to render into.
-	 * \param content The content to render.
-	 */
-	nserror (*render)(struct bitmap *bitmap, struct hlcache_handle *content);
-};
+/**
+ * Render content into a bitmap.
+ *
+ * \param bitmap The bitmap to render into.
+ * \param content The content to render.
+ */
+nserror gui_bitmap_render(struct bitmap *bitmap, struct hlcache_handle *content);
 
 #endif

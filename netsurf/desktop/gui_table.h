@@ -29,7 +29,6 @@
 
 struct gui_misc_table;
 struct gui_window_table;
-struct gui_bitmap_table;
 struct gui_layout_table;
 
 /**
@@ -56,16 +55,6 @@ struct netsurf_table {
 	 * The table is mandantory and must be provided.
 	 */
 	struct gui_window_table *window;
-
-	/**
-	 * Bitmap table.
-	 *
-	 * Used by the image convertors as a generic interface to
-	 * native platform-specific image formats.
-	 *
-	 * The table is mandantory and must be provided.
-	 */
-	struct gui_bitmap_table *bitmap;
 
 	/**
 	 * Layout table

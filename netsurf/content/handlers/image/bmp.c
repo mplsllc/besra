@@ -66,15 +66,15 @@ static void *nsbmp_bitmap_create(int width, int height, unsigned int bmp_state)
 			BITMAP_CLEAR : 0;
 
 	/* return the created bitmap */
-	return guit->bitmap->create(width, height, bitmap_state);
+	return gui_bitmap_create(width, height, bitmap_state);
 }
 
 static nserror nsbmp_create_bmp_data(nsbmp_content *bmp)
 {
 	bmp_bitmap_callback_vt bmp_bitmap_callbacks = {
 		.bitmap_create = nsbmp_bitmap_create,
-		.bitmap_destroy = guit->bitmap->destroy,
-		.bitmap_get_buffer = guit->bitmap->get_buffer,
+		.bitmap_destroy = gui_bitmap_destroy,
+		.bitmap_get_buffer = gui_bitmap_get_buffer,
 	};
 
 	bmp->bmp = calloc(1, sizeof(struct bmp_image));
@@ -193,7 +193,7 @@ static bool nsbmp_redraw(struct content *c, struct content_redraw_data *data,
 		bitmap_format_to_client(bmp->bitmap, &(bitmap_fmt_t) {
 			.layout = BITMAP_LAYOUT_R8G8B8A8,
 		});
-		guit->bitmap->modified(bmp->bitmap);
+		gui_bitmap_modified(bmp->bitmap);
 	}
 
 	if (data->repeat_x)
@@ -271,7 +271,7 @@ static bool nsbmp_content_is_opaque(struct content *c)
 	nsbmp_content *bmp = (nsbmp_content *)c;
 
 	if (bmp->bitmap != NULL) {
-		return guit->bitmap->get_opaque(bmp->bitmap);
+		return gui_bitmap_get_opaque(bmp->bitmap);
 	}
 
 	return false;

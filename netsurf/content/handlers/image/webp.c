@@ -121,7 +121,7 @@ webp_cache_convert(struct content *c)
 	}
 
 	/* create bitmap */
-	bitmap = guit->bitmap->create(webpfeatures.width,
+	bitmap = gui_bitmap_create(webpfeatures.width,
 				      webpfeatures.height,
 				      bmap_flags);
 	if (bitmap == NULL) {
@@ -129,14 +129,14 @@ webp_cache_convert(struct content *c)
 		return NULL;
 	}
 
-	pixels = guit->bitmap->get_buffer(bitmap);
+	pixels = gui_bitmap_get_buffer(bitmap);
 	if (pixels == NULL) {
 		/* bitmap with no buffer available */
-		guit->bitmap->destroy(bitmap);
+		gui_bitmap_destroy(bitmap);
 		return NULL;
 	}
 
-	rowstride = guit->bitmap->get_rowstride(bitmap);
+	rowstride = gui_bitmap_get_rowstride(bitmap);
 
 	switch (webp_fmt.layout) {
 	default:
@@ -160,12 +160,12 @@ webp_cache_convert(struct content *c)
 	}
 	if (decoded == NULL) {
 		/* decode failed */
-		guit->bitmap->destroy(bitmap);
+		gui_bitmap_destroy(bitmap);
 		return NULL;
 	}
 
 	bitmap_format_to_client(bitmap, &webp_fmt);
-	guit->bitmap->modified(bitmap);
+	gui_bitmap_modified(bitmap);
 
 	return bitmap;
 }

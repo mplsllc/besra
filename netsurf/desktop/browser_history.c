@@ -103,16 +103,16 @@ browser_window_history__clone_entry(struct history *history,
 		unsigned char *bmdst_data;
 		size_t bmsize;
 
-		new_entry->page.bitmap = guit->bitmap->create(
+		new_entry->page.bitmap = gui_bitmap_create(
 				LOCAL_HISTORY_WIDTH,
 				LOCAL_HISTORY_HEIGHT,
 				BITMAP_OPAQUE);
 
 		if (new_entry->page.bitmap != NULL) {
-			bmsrc_data = guit->bitmap->get_buffer(entry->page.bitmap);
-			bmdst_data = guit->bitmap->get_buffer(new_entry->page.bitmap);
-			bmsize = guit->bitmap->get_rowstride(new_entry->page.bitmap) *
-				guit->bitmap->get_height(new_entry->page.bitmap);
+			bmsrc_data = gui_bitmap_get_buffer(entry->page.bitmap);
+			bmdst_data = gui_bitmap_get_buffer(new_entry->page.bitmap);
+			bmsize = gui_bitmap_get_rowstride(new_entry->page.bitmap) *
+				gui_bitmap_get_height(new_entry->page.bitmap);
 			memcpy(bmdst_data, bmsrc_data, bmsize);
 		}
 	}
@@ -132,7 +132,7 @@ browser_window_history__clone_entry(struct history *history,
 			lwc_string_unref(new_entry->page.frag_id);
 			free(new_entry->page.title);
 			if (entry->page.bitmap != NULL) {
-				guit->bitmap->destroy(entry->page.bitmap);
+				gui_bitmap_destroy(entry->page.bitmap);
 			}
 			free(new_entry);
 			return NULL;
@@ -173,7 +173,7 @@ static void browser_window_history__free_entry(struct history_entry *entry)
 		lwc_string_unref(entry->page.frag_id);
 		free(entry->page.title);
 		if (entry->page.bitmap != NULL) {
-			guit->bitmap->destroy(entry->page.bitmap);
+			gui_bitmap_destroy(entry->page.bitmap);
 		}
 		free(entry);
 	}
@@ -382,11 +382,11 @@ browser_window_history_add(struct browser_window *bw,
 	NSLOG(netsurf, DEBUG,
 	      "Creating thumbnail for %s", nsurl_access(entry->page.url));
 
-	entry->page.bitmap = guit->bitmap->create(
+	entry->page.bitmap = gui_bitmap_create(
 			LOCAL_HISTORY_WIDTH, LOCAL_HISTORY_HEIGHT,
 			BITMAP_CLEAR | BITMAP_OPAQUE);
 	if (entry->page.bitmap != NULL) {
-		ret = guit->bitmap->render(entry->page.bitmap, content);
+		ret = gui_bitmap_render(entry->page.bitmap, content);
 		if (ret != NSERROR_OK) {
 			/* Thumbnail render failed */
 			NSLOG(netsurf, WARNING, "Thumbnail render failed");
@@ -447,7 +447,7 @@ nserror browser_window_history_update(struct browser_window *bw,
 	history->current->page.title = title;
 
 	if (history->current->page.bitmap != NULL) {
-		guit->bitmap->render(history->current->page.bitmap, content);
+		gui_bitmap_render(history->current->page.bitmap, content);
 	}
 
 	if ((bw->window != NULL) &&

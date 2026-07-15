@@ -205,62 +205,6 @@ static nserror verify_window_register(struct gui_window_table *gwt)
 }
 
 
-/**
- * verify bitmap table is valid
- *
- * \param gbt The bitmap table to verify.
- * \return NSERROR_OK if the table is valid else NSERROR_BAD_PARAMETER.
- */
-static nserror verify_bitmap_register(struct gui_bitmap_table *gbt)
-{
-	/* check table is present */
-	if (gbt == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-
-	/* check the mandantory fields are set */
-	if (gbt->create == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-
-	if (gbt->destroy == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-
-	if (gbt->set_opaque == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-
-	if (gbt->get_opaque == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-
-	if (gbt->get_buffer == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-
-	if (gbt->get_rowstride == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-
-	if (gbt->get_width == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-
-	if (gbt->get_height == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-
-	if (gbt->modified == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-
-	if (gbt->render == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-
-	return NSERROR_OK;
-}
 
 /**
  * verify layout table is valid
@@ -385,12 +329,6 @@ nserror netsurf_register(struct netsurf_table *gt)
 
 	/* window table */
 	err = verify_window_register(gt->window);
-	if (err != NSERROR_OK) {
-		return err;
-	}
-
-	/* bitmap table */
-	err = verify_bitmap_register(gt->bitmap);
 	if (err != NSERROR_OK) {
 		return err;
 	}

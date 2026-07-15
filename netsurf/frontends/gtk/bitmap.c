@@ -49,7 +49,7 @@
  * \param  flags   flags for bitmap creation
  * \return an opaque struct bitmap, or NULL on memory exhaustion
  */
-static void *bitmap_create(int width, int height, enum gui_bitmap_flags flags)
+void *gui_bitmap_create(int width, int height, enum gui_bitmap_flags flags)
 {
 	struct bitmap *gbitmap;
 
@@ -78,10 +78,10 @@ static void *bitmap_create(int width, int height, enum gui_bitmap_flags flags)
 /**
  * Sets whether a bitmap should be plotted opaque
  *
- * \param  vbitmap  a bitmap, as returned by bitmap_create()
+ * \param  vbitmap  a bitmap, as returned by gui_bitmap_create()
  * \param  opaque   whether the bitmap should be plotted opaque
  */
-static void bitmap_set_opaque(void *vbitmap, bool opaque)
+void gui_bitmap_set_opaque(void *vbitmap, bool opaque)
 {
 	struct bitmap *gbitmap = (struct bitmap *)vbitmap;
 
@@ -92,9 +92,9 @@ static void bitmap_set_opaque(void *vbitmap, bool opaque)
 /**
  * Gets whether a bitmap should be plotted opaque
  *
- * \param  vbitmap  a bitmap, as returned by bitmap_create()
+ * \param  vbitmap  a bitmap, as returned by gui_bitmap_create()
  */
-static bool bitmap_get_opaque(void *vbitmap)
+bool gui_bitmap_get_opaque(void *vbitmap)
 {
 	struct bitmap *gbitmap = (struct bitmap *)vbitmap;
 
@@ -105,13 +105,13 @@ static bool bitmap_get_opaque(void *vbitmap)
 /**
  * Return a pointer to the pixel data in a bitmap.
  *
- * \param  vbitmap  a bitmap, as returned by bitmap_create()
+ * \param  vbitmap  a bitmap, as returned by gui_bitmap_create()
  * \return pointer to the pixel buffer
  *
  * The pixel data is packed as BITMAP_FORMAT, possibly with padding at the end
- * of rows. The width of a row in bytes is given by bitmap_get_rowstride().
+ * of rows. The width of a row in bytes is given by gui_bitmap_get_rowstride().
  */
-static unsigned char *bitmap_get_buffer(void *vbitmap)
+unsigned char *gui_bitmap_get_buffer(void *vbitmap)
 {
 	struct bitmap *gbitmap = (struct bitmap *)vbitmap;
 	uint8_t *pixels;
@@ -128,10 +128,10 @@ static unsigned char *bitmap_get_buffer(void *vbitmap)
 /**
  * Find the width of a pixel row in bytes.
  *
- * \param  vbitmap  a bitmap, as returned by bitmap_create()
+ * \param  vbitmap  a bitmap, as returned by gui_bitmap_create()
  * \return width of a pixel row in the bitmap
  */
-static size_t bitmap_get_rowstride(void *vbitmap)
+size_t gui_bitmap_get_rowstride(void *vbitmap)
 {
 	struct bitmap *gbitmap = (struct bitmap *)vbitmap;
 	assert(gbitmap);
@@ -143,9 +143,9 @@ static size_t bitmap_get_rowstride(void *vbitmap)
 /**
  * Free a bitmap.
  *
- * \param  vbitmap  a bitmap, as returned by bitmap_create()
+ * \param  vbitmap  a bitmap, as returned by gui_bitmap_create()
  */
-static void bitmap_destroy(void *vbitmap)
+void gui_bitmap_destroy(void *vbitmap)
 {
 	struct bitmap *gbitmap = (struct bitmap *)vbitmap;
 	assert(gbitmap);
@@ -163,9 +163,9 @@ static void bitmap_destroy(void *vbitmap)
 /**
  * The bitmap image has changed, so flush any persistant cache.
  *
- * \param  vbitmap  a bitmap, as returned by bitmap_create()
+ * \param  vbitmap  a bitmap, as returned by gui_bitmap_create()
  */
-static void bitmap_modified(void *vbitmap)
+void gui_bitmap_modified(void *vbitmap)
 {
 	struct bitmap *gbitmap = (struct bitmap *)vbitmap;
 
@@ -175,7 +175,7 @@ static void bitmap_modified(void *vbitmap)
 }
 
 /* exported interface documented in gtk/bitmap.h */
-int nsgtk_bitmap_get_width(void *vbitmap)
+int gui_bitmap_get_width(void *vbitmap)
 {
 	struct bitmap *gbitmap = (struct bitmap *)vbitmap;
 	assert(gbitmap);
@@ -184,7 +184,7 @@ int nsgtk_bitmap_get_width(void *vbitmap)
 }
 
 /* exported interface documented in gtk/bitmap.h */
-int nsgtk_bitmap_get_height(void *vbitmap)
+int gui_bitmap_get_height(void *vbitmap)
 {
 	struct bitmap *gbitmap = (struct bitmap *)vbitmap;
 	assert(gbitmap);
@@ -199,8 +199,8 @@ int nsgtk_bitmap_get_height(void *vbitmap)
  * \param  content The content to render
  * \return true on success and bitmap updated else false
  */
-static nserror
-bitmap_render(struct bitmap *bitmap, struct hlcache_handle *content)
+nserror
+gui_bitmap_render(struct bitmap *bitmap, struct hlcache_handle *content)
 {
 	cairo_surface_t *dsurface = bitmap->surface;
 	cairo_surface_t *surface;
@@ -277,18 +277,3 @@ bitmap_render(struct bitmap *bitmap, struct hlcache_handle *content)
 	return NSERROR_OK;
 }
 
-
-static struct gui_bitmap_table bitmap_table = {
-	.create = bitmap_create,
-	.destroy = bitmap_destroy,
-	.set_opaque = bitmap_set_opaque,
-	.get_opaque = bitmap_get_opaque,
-	.get_buffer = bitmap_get_buffer,
-	.get_rowstride = bitmap_get_rowstride,
-	.get_width = nsgtk_bitmap_get_width,
-	.get_height = nsgtk_bitmap_get_height,
-	.modified = bitmap_modified,
-	.render = bitmap_render,
-};
-
-struct gui_bitmap_table *nsgtk_bitmap_table = &bitmap_table;

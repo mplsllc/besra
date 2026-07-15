@@ -86,18 +86,18 @@ canvas2d_user_data_handler(dom_node_operation operation,
 
 	switch (operation) {
 	case DOM_NODE_CLONED:
-		width = guit->bitmap->get_width(bitmap);
-		height = guit->bitmap->get_height(bitmap);
-		stride = guit->bitmap->get_rowstride(bitmap);
-		newbitmap = guit->bitmap->create(width, height,
+		width = gui_bitmap_get_width(bitmap);
+		height = gui_bitmap_get_height(bitmap);
+		stride = gui_bitmap_get_rowstride(bitmap);
+		newbitmap = gui_bitmap_create(width, height,
 						 BITMAP_NONE);
 		if (newbitmap != NULL) {
-			if (guit->bitmap->get_rowstride(newbitmap) == stride) {
+			if (gui_bitmap_get_rowstride(newbitmap) == stride) {
 				// Compatible bitmap, bung the data over
-				memcpy(guit->bitmap->get_buffer(newbitmap),
-				       guit->bitmap->get_buffer(bitmap),
+				memcpy(gui_bitmap_get_buffer(newbitmap),
+				       gui_bitmap_get_buffer(bitmap),
 				       stride * height);
-				guit->bitmap->modified(newbitmap);
+				gui_bitmap_modified(newbitmap);
 			}
 		}
 		if (dom_node_set_user_data(dst,
@@ -105,7 +105,7 @@ canvas2d_user_data_handler(dom_node_operation operation,
 					   newbitmap, canvas2d_user_data_handler,
 					   &oldbitmap) == DOM_NO_ERR) {
 			if (oldbitmap != NULL)
-				guit->bitmap->destroy(oldbitmap);
+				gui_bitmap_destroy(oldbitmap);
 		}
 		break;
 
@@ -115,7 +115,7 @@ canvas2d_user_data_handler(dom_node_operation operation,
 		break;
 
 	case DOM_NODE_DELETED:
-		guit->bitmap->destroy(bitmap);
+		gui_bitmap_destroy(bitmap);
 		break;
 	default:
 		NSLOG(netsurf, INFO, "User data operation not handled.");
@@ -171,7 +171,7 @@ static nserror canvas2d_create_bitmap(dom_node *node, struct bitmap **bitmap_out
 		dom_string_unref(height_s);
 	}
 
-	bitmap = guit->bitmap->create(
+	bitmap = gui_bitmap_create(
 		(int)width, (int)height,
 		BITMAP_NONE);
 
@@ -179,10 +179,10 @@ static nserror canvas2d_create_bitmap(dom_node *node, struct bitmap **bitmap_out
 		return NSERROR_NOMEM;
 	}
 
-	memset(guit->bitmap->get_buffer(bitmap),
+	memset(gui_bitmap_get_buffer(bitmap),
 	       0, /* Transparent black */
-	       height * guit->bitmap->get_rowstride(bitmap));
-	guit->bitmap->modified(bitmap);
+	       height * gui_bitmap_get_rowstride(bitmap));
+	gui_bitmap_modified(bitmap);
 
 	exc = dom_node_set_user_data(node,
 				     corestring_dom___ns_key_canvas_node_data,
@@ -191,7 +191,7 @@ static nserror canvas2d_create_bitmap(dom_node *node, struct bitmap **bitmap_out
 				     &oldbitmap);
 
 	if (exc != DOM_NO_ERR) {
-		guit->bitmap->destroy(bitmap);
+		gui_bitmap_destroy(bitmap);
 		return NSERROR_DOM;
 	}
 
@@ -242,14 +242,14 @@ canvas2d__handle_dom_event(dom_event *evt, void *pw)
 	
 	/* Okay, we need to reallocate our bitmap and re-cache values */
 	
-	newbitmap = guit->bitmap->create(width, height, BITMAP_NONE);
-	stride = guit->bitmap->get_rowstride(newbitmap);
+	newbitmap = gui_bitmap_create(width, height, BITMAP_NONE);
+	stride = gui_bitmap_get_rowstride(newbitmap);
 
 	if (newbitmap != NULL) {
-		memset(guit->bitmap->get_buffer(newbitmap),
+		memset(gui_bitmap_get_buffer(newbitmap),
 		       0,
 		       stride * height);
-		guit->bitmap->modified(newbitmap);
+		gui_bitmap_modified(newbitmap);
 	}
 
 	if (dom_node_set_user_data(priv->canvas,
@@ -257,9 +257,9 @@ canvas2d__handle_dom_event(dom_event *evt, void *pw)
 				   newbitmap, canvas2d_user_data_handler,
 				   &oldbitmap) == DOM_NO_ERR) {
 		if (oldbitmap != NULL)
-			guit->bitmap->destroy(oldbitmap);
+			gui_bitmap_destroy(oldbitmap);
 	} else {
-		guit->bitmap->destroy(newbitmap);
+		gui_bitmap_destroy(newbitmap);
 		/* We'll stick with the old, odd though that might be */
 		return;
 	}
@@ -382,9 +382,9 @@ init CanvasRenderingContext2D(struct dom_html_canvas_element *canvas)
 	assert(bitmap != NULL);
 	
 	priv->bitmap = bitmap;
-	priv->width = guit->bitmap->get_width(bitmap);
-	priv->height = guit->bitmap->get_height(bitmap);
-	priv->stride = guit->bitmap->get_rowstride(bitmap);
+	priv->width = gui_bitmap_get_width(bitmap);
+	priv->height = gui_bitmap_get_height(bitmap);
+	priv->stride = gui_bitmap_get_rowstride(bitmap);
 %}
 
 fini CanvasRenderingContext2D()
@@ -517,7 +517,7 @@ method CanvasRenderingContext2D::getImageData()
 	/* We now have access to the imagedata private, so we need to copy
 	 * the pixel range out of ourselves
 	 */
-	copyop.src.ptr = guit->bitmap->get_buffer(priv->bitmap);
+	copyop.src.ptr = gui_bitmap_get_buffer(priv->bitmap);
 	copyop.src.stride = priv->stride;
 	copyop.src.width = priv->width;
 	copyop.src.height = priv->height;
@@ -572,7 +572,7 @@ method CanvasRenderingContext2D::putImageData()
 	copyop.src.height = idpriv->height;
 
 	/* Copying to ourselves */
-	copyop.dst.ptr = guit->bitmap->get_buffer(priv->bitmap);
+	copyop.dst.ptr = gui_bitmap_get_buffer(priv->bitmap);
 	copyop.dst.stride = priv->stride;
 	copyop.dst.width = priv->width;
 	copyop.dst.height = priv->height;
@@ -595,7 +595,7 @@ method CanvasRenderingContext2D::putImageData()
 	}
 
 	if (canvas2d__copy_bitmap_to_bitmap(&copyop)) {
-		guit->bitmap->modified(priv->bitmap);
+		gui_bitmap_modified(priv->bitmap);
 		redraw_node((dom_node *)(priv->canvas));
 	}
 

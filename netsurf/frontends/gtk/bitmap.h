@@ -21,7 +21,6 @@
 
 #include <cairo.h>
 
-extern struct gui_bitmap_table *nsgtk_bitmap_table;
 
 struct bitmap {
 	cairo_surface_t *surface; /* original cairo surface */
@@ -29,7 +28,7 @@ struct bitmap {
 	bool opaque;
 };
 
-int nsgtk_bitmap_get_width(void *vbitmap);
-int nsgtk_bitmap_get_height(void *vbitmap);
+int gui_bitmap_get_width(void *vbitmap);
+int gui_bitmap_get_height(void *vbitmap);
 
 #endif /* NS_GTK_BITMAP_H */

@@ -193,13 +193,13 @@ static void info_callback(png_structp png_s, png_infop info)
 	}
 
 	/* Claim the required memory for the converted PNG */
-	png_c->bitmap = guit->bitmap->create(width, height, BITMAP_NONE);
+	png_c->bitmap = gui_bitmap_create(width, height, BITMAP_NONE);
 	if (png_c->bitmap == NULL) {
 		/* Failed to create bitmap skip pre-conversion */
 		longjmp(png_jmpbuf(png_s), CBERR_NOPRE);
 	}
 
-	png_c->rowstride = guit->bitmap->get_rowstride(png_c->bitmap);
+	png_c->rowstride = gui_bitmap_get_rowstride(png_c->bitmap);
 	png_c->bpp = sizeof(uint32_t);
 
 	nspng_setup_transforms(png_s, info);
@@ -227,7 +227,7 @@ static void row_callback(png_structp png_s, png_bytep new_row,
 		return;
 
 	/* Get bitmap buffer */
-	buffer = guit->bitmap->get_buffer(png_c->bitmap);
+	buffer = gui_bitmap_get_buffer(png_c->bitmap);
 	if (buffer == NULL) {
 		/* No buffer, bail out */
 		longjmp(png_jmpbuf(png_s), 1);
@@ -429,9 +429,9 @@ png_cache_read_fn(png_structp png_ptr, png_bytep data, png_size_t length)
  */
 static png_bytep *calc_row_pointers(struct bitmap *bitmap)
 {
-	int height = guit->bitmap->get_height(bitmap);
-	unsigned char *buffer= guit->bitmap->get_buffer(bitmap);
-	size_t rowstride = guit->bitmap->get_rowstride(bitmap);
+	int height = gui_bitmap_get_height(bitmap);
+	unsigned char *buffer= gui_bitmap_get_buffer(bitmap);
+	size_t rowstride = gui_bitmap_get_rowstride(bitmap);
 	png_bytep *row_ptrs;
 	int hloop;
 
@@ -513,7 +513,7 @@ png_cache_convert(struct content *c)
 	height = png_get_image_height(png_ptr, info_ptr);
 
 	/* Claim the required memory for the converted PNG */
-	bitmap = guit->bitmap->create(width, height, BITMAP_NONE);
+	bitmap = gui_bitmap_create(width, height, BITMAP_NONE);
 	if (bitmap == NULL) {
 		/* cleanup and bail */
 		goto png_cache_convert_error;
@@ -524,7 +524,7 @@ png_cache_convert(struct content *c)
 	if (row_pointers != NULL) {
 		png_read_image(png_ptr, (png_bytep *) row_pointers);
 	} else {
-		guit->bitmap->destroy((struct bitmap *)bitmap);
+		gui_bitmap_destroy((struct bitmap *)bitmap);
 		bitmap = NULL;
 	}
 
@@ -539,12 +539,12 @@ png_cache_convert_error:
 
 	if (bitmap != NULL) {
 		bool opaque = bitmap_test_opaque((void *)bitmap);
-		guit->bitmap->set_opaque((void *)bitmap, opaque);
+		gui_bitmap_set_opaque((void *)bitmap, opaque);
 		bitmap_format_to_client((void *)bitmap, &(bitmap_fmt_t) {
 			.layout = bitmap_fmt.layout,
 			.pma = opaque ? bitmap_fmt.pma : false,
 		});
-		guit->bitmap->modified((void *)bitmap);
+		gui_bitmap_modified((void *)bitmap);
 	}
 
 	return (struct bitmap *)bitmap;
@@ -572,12 +572,12 @@ static bool nspng_convert(struct content *c)
 
 	if (png_c->bitmap != NULL) {
 		bool opaque = bitmap_test_opaque(png_c->bitmap);
-		guit->bitmap->set_opaque(png_c->bitmap, opaque);
+		gui_bitmap_set_opaque(png_c->bitmap, opaque);
 		bitmap_format_to_client(png_c->bitmap, &(bitmap_fmt_t) {
 			.layout = bitmap_fmt.layout,
 			.pma = opaque ? bitmap_fmt.pma : false,
 		});
-		guit->bitmap->modified(png_c->bitmap);
+		gui_bitmap_modified(png_c->bitmap);
 	}
 
 	image_cache_add(c, png_c->bitmap, png_cache_convert);
