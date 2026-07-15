@@ -1066,7 +1066,7 @@ static nserror llcache_object_destroy(llcache_object *object)
 
 	if (object->source_data != NULL) {
 		if (object->store_state == LLCACHE_STATE_DISC) {
-			guit->llcache->release(object->url, BACKING_STORE_NONE);
+			gui_llcache_release(object->url, BACKING_STORE_NONE);
 		} else {
 			free(object->source_data);
 		}
@@ -1299,7 +1299,7 @@ static nserror llcache_retrieve_persisted_data(llcache_object *object)
 	}
 
 	/* Source data for the object may be in the persistent store */
-	return guit->llcache->fetch(object->url,
+	return gui_llcache_fetch(object->url,
 				    BACKING_STORE_NONE,
 				    &object->source_data,
 				    &object->source_len);
@@ -1552,7 +1552,7 @@ llcache_process_metadata(llcache_object *object)
 	NSLOG(llcache, INFO, "Retrieving metadata");
 
 	/* attempt to retrieve object metadata from the backing store */
-	res = guit->llcache->fetch(object->url,
+	res = gui_llcache_fetch(object->url,
 				   BACKING_STORE_META,
 				   &metadata,
 				   &metadatalen);
@@ -1598,7 +1598,7 @@ llcache_process_metadata(llcache_object *object)
 
 		nsurl_unref(metadataurl);
 
-		guit->llcache->release(object->url, BACKING_STORE_META);
+		gui_llcache_release(object->url, BACKING_STORE_META);
 
 		return NSERROR_BAD_URL;
 	}
@@ -1743,7 +1743,7 @@ llcache_process_metadata(llcache_object *object)
 	}
 
 skip_ssl_certificates:
-	guit->llcache->release(object->url, BACKING_STORE_META);
+	gui_llcache_release(object->url, BACKING_STORE_META);
 
 	/* update object on successful parse of metadata  */
 	object->source_len = source_length;
@@ -1766,7 +1766,7 @@ format_error:
 	NSLOG(llcache, INFO,
 	      "metadata error on line %d error code %d\n",
 	      line, res);
-	guit->llcache->release(object->url, BACKING_STORE_META);
+	gui_llcache_release(object->url, BACKING_STORE_META);
 
 	cert_chain_free(chain);
 
@@ -2885,7 +2885,7 @@ write_backing_store(struct llcache_object *object,
 	nsu_getmonotonic_ms(&startms);
 
 	/* put object data in backing store */
-	ret = guit->llcache->store(object->url,
+	ret = gui_llcache_store(object->url,
 				   BACKING_STORE_NONE,
 				   object->source_data,
 				   object->source_len);
@@ -2899,20 +2899,20 @@ write_backing_store(struct llcache_object *object,
 		/* There has been a metadata serialisation error. Ensure the
 		 * already written data object is invalidated.
 		 */
-		guit->llcache->invalidate(object->url);
+		gui_llcache_invalidate(object->url);
 		return ret;
 	}
 
-	ret = guit->llcache->store(object->url,
+	ret = gui_llcache_store(object->url,
 				   BACKING_STORE_META,
 				   metadata,
 				   metadatasize);
-	guit->llcache->release(object->url, BACKING_STORE_META);
+	gui_llcache_release(object->url, BACKING_STORE_META);
 	if (ret != NSERROR_OK) {
 		/* There has been an error putting the metadata in the
 		 * backing store. Ensure the data object is invalidated.
 		 */
-		guit->llcache->invalidate(object->url);
+		gui_llcache_invalidate(object->url);
 		return ret;
 	}
 	nsu_getmonotonic_ms(&endms);
@@ -2961,7 +2961,7 @@ static void llcache_persist_slowcheck(void *p)
 			      "Current bandwidth %"PRIu64" less than minimum %"PRIsizet,
 			      total_bandwidth,
 			      llcache->minimum_bandwidth);
-			guit->llcache->finalise();
+			gui_llcache_finalise();
 		}
 	}
 }
@@ -3824,7 +3824,7 @@ void llcache_clean(bool purge)
 						&llcache->cached_objects);
 
 				if (object->store_state == LLCACHE_STATE_DISC) {
-					guit->llcache->invalidate(object->url);
+					gui_llcache_invalidate(object->url);
 				}
 
 				llcache_object_destroy(object);
@@ -3855,7 +3855,7 @@ void llcache_clean(bool purge)
 		    (object->candidate_count == 0) &&
 		    (object->fetch.fetch == NULL) &&
 		    (object->store_state == LLCACHE_STATE_DISC)) {
-			guit->llcache->release(object->url, BACKING_STORE_NONE);
+			gui_llcache_release(object->url, BACKING_STORE_NONE);
 
 			object->source_data = NULL;
 
@@ -3950,7 +3950,7 @@ llcache_initialise(const struct llcache_parameters *prm)
 	      llcache->limit);
 
 	/* backing store initialisation */
-	return guit->llcache->initialise(&prm->store);
+	return gui_llcache_initialise(&prm->store);
 }
 
 
@@ -4008,7 +4008,7 @@ void llcache_finalise(void)
 	}
 
 	/* backing store finalisation */
-	guit->llcache->finalise();
+	gui_llcache_finalise();
 
 	if (llcache->total_elapsed > 0) {
 		total_bandwidth = (llcache->total_written * 1000) /

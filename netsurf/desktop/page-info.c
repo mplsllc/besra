@@ -530,7 +530,7 @@ static nserror page_info__layout(
 
 	pi->width = max_x;
 	pi->height = cur_y;
-	return guit->corewindow->set_extent(pi->cw_h, max_x, cur_y);
+	return gui_corewindow_set_extent(pi->cw_h, max_x, cur_y);
 }
 
 /* Exported interface documented in desktop/page_info.h */
@@ -792,10 +792,10 @@ nserror page_info_mouse_action(
 					.y0 = cur_y,
 					.y1 = cur_y + height,
 				};
-				guit->corewindow->get_dimensions(pi->cw_h, &w, &h);
+				gui_corewindow_get_dimensions(pi->cw_h, &w, &h);
 				r.x1 = (pi->width > w) ? pi->width : w;
 
-				guit->corewindow->invalidate(pi->cw_h, &r);
+				gui_corewindow_invalidate(pi->cw_h, &r);
 			}
 			entry->u.item.hover = hovering;
 			cur_y += height;

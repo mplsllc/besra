@@ -44,12 +44,12 @@ nserror cw_helper_scroll_visible(struct core_window *cw_h, const struct rect *r)
 
 	assert(cw_h != NULL);
 
-	err = guit->corewindow->get_dimensions(cw_h, &width, &height);
+	err = gui_corewindow_get_dimensions(cw_h, &width, &height);
 	if (err != NSERROR_OK) {
 		return err;
 	}
 
-	guit->corewindow->get_scroll(cw_h, &x0, &y0);
+	gui_corewindow_get_scroll(cw_h, &x0, &y0);
 	if (err != NSERROR_OK) {
 		return err;
 	}
@@ -82,5 +82,5 @@ nserror cw_helper_scroll_visible(struct core_window *cw_h, const struct rect *r)
 		x0 = r->x0;
 	}
 
-	return guit->corewindow->set_scroll(cw_h, x0, y0);
+	return gui_corewindow_set_scroll(cw_h, x0, y0);
 }

@@ -29,7 +29,6 @@
 
 struct gui_misc_table;
 struct gui_window_table;
-struct gui_llcache_table;
 struct gui_bitmap_table;
 struct gui_layout_table;
 
@@ -57,26 +56,6 @@ struct netsurf_table {
 	 * The table is mandantory and must be provided.
 	 */
 	struct gui_window_table *window;
-
-	/**
-	 * Core window table.
-	 *
-	 * Provides all operations which affect core ui windows of a frontend.
-	 *
-	 * The table is optional and may be NULL which does nothing.
-	 */
-	struct core_window_table *corewindow;
-
-	/**
-	 * Low level cache table.
-	 *
-	 * Used by the low level cache to push objects to persistant
-	 * storage.
-	 *
-	 * The table is optional and may be NULL which uses the
-	 * default implementation.
-	 */
-	struct gui_llcache_table *llcache;
 
 	/**
 	 * Bitmap table.

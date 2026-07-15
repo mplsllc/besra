@@ -566,8 +566,8 @@ nsgtk_cw_draw_event(GtkWidget *widget,
  * \param[in] rect area to redraw or NULL for the entire window area.
  * \return NSERROR_OK on success or appropriate error code.
  */
-static nserror
-nsgtk_cw_invalidate_area(struct core_window *cw, const struct rect *rect)
+nserror
+gui_corewindow_invalidate(struct core_window *cw, const struct rect *rect)
 {
 	struct nsgtk_corewindow *nsgtk_cw = (struct nsgtk_corewindow *)cw;
 
@@ -593,8 +593,8 @@ nsgtk_cw_invalidate_area(struct core_window *cw, const struct rect *rect)
  * \param width New widget width.
  * \param height New widget height.
  */
-static nserror
-nsgtk_cw_update_size(struct core_window *cw, int width, int height)
+nserror
+gui_corewindow_set_extent(struct core_window *cw, int width, int height)
 {
 	struct nsgtk_corewindow *nsgtk_cw = (struct nsgtk_corewindow *)cw;
 
@@ -611,8 +611,8 @@ nsgtk_cw_update_size(struct core_window *cw, int width, int height)
  * \param cw core window handle.
  * \param r rectangle that needs scrolling.
  */
-static nserror
-nsgtk_cw_set_scroll(struct core_window *cw, int x, int y)
+nserror
+gui_corewindow_set_scroll(struct core_window *cw, int x, int y)
 {
 	struct nsgtk_corewindow *nsgtk_cw = (struct nsgtk_corewindow *)cw;
 
@@ -639,8 +639,8 @@ nsgtk_cw_set_scroll(struct core_window *cw, int x, int y)
  * \param cw core window handle.
  * \param r rectangle that needs scrolling.
  */
-static nserror
-nsgtk_cw_get_scroll(const struct core_window *cw, int *x, int *y)
+nserror
+gui_corewindow_get_scroll(const struct core_window *cw, int *x, int *y)
 {
 	struct nsgtk_corewindow *nsgtk_cw = (struct nsgtk_corewindow *)cw;
 
@@ -671,8 +671,8 @@ nsgtk_cw_get_scroll(const struct core_window *cw, int *x, int *y)
  * \param[out] width to be set to viewport width in px
  * \param[out] height to be set to viewport height in px
  */
-static nserror
-nsgtk_cw_get_window_dimensions(const struct core_window *cw,
+nserror
+gui_corewindow_get_dimensions(const struct core_window *cw,
 		int *width, int *height)
 {
 	struct nsgtk_corewindow *nsgtk_cw = (struct nsgtk_corewindow *)cw;
@@ -705,8 +705,8 @@ nsgtk_cw_get_window_dimensions(const struct core_window *cw,
  * \param cw core window handle.
  * \param ds The new drag status.
  */
-static nserror
-nsgtk_cw_drag_status(struct core_window *cw, core_window_drag_status ds)
+nserror
+gui_corewindow_drag_status(struct core_window *cw, core_window_drag_status ds)
 {
 	struct nsgtk_corewindow *nsgtk_cw = (struct nsgtk_corewindow *)cw;
 	nsgtk_cw->drag_status = ds;
@@ -718,17 +718,6 @@ nsgtk_cw_drag_status(struct core_window *cw, core_window_drag_status ds)
 /**
  * core window callback table for nsgtk
  */
-static struct core_window_table nsgtk_cw_cb_table = {
-	.invalidate = nsgtk_cw_invalidate_area,
-	.set_extent = nsgtk_cw_update_size,
-	.set_scroll = nsgtk_cw_set_scroll,
-	.get_scroll = nsgtk_cw_get_scroll,
-	.get_dimensions = nsgtk_cw_get_window_dimensions,
-	.drag_status = nsgtk_cw_drag_status
-};
-
-struct core_window_table *nsgtk_core_window_table = &nsgtk_cw_cb_table;
-
 /* exported function documented gtk/corewindow.h */
 nserror nsgtk_corewindow_init(struct nsgtk_corewindow *nsgtk_cw)
 {

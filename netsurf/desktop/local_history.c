@@ -462,7 +462,7 @@ local_history_keypress(struct local_history_session *session, uint32_t key)
 			browser_window_history_go(session->bw, session->cursor,
 						  false);
 			local_history_scroll_to_cursor(session);
-			guit->corewindow->invalidate(session->core_window_handle, NULL);
+			gui_corewindow_invalidate(session->core_window_handle, NULL);
 		}
 		/* We have handled this keypress */
 		return true;
@@ -471,7 +471,7 @@ local_history_keypress(struct local_history_session *session, uint32_t key)
 		if (session->cursor->back != NULL) {
 			session->cursor = session->cursor->back;
 			local_history_scroll_to_cursor(session);
-			guit->corewindow->invalidate(session->core_window_handle, NULL);
+			gui_corewindow_invalidate(session->core_window_handle, NULL);
 		}
 		/* We have handled this keypress */
 		return true;
@@ -480,7 +480,7 @@ local_history_keypress(struct local_history_session *session, uint32_t key)
 		if (session->cursor->forward_pref != NULL) {
 			session->cursor = session->cursor->forward_pref;
 			local_history_scroll_to_cursor(session);
-			guit->corewindow->invalidate(session->core_window_handle, NULL);
+			gui_corewindow_invalidate(session->core_window_handle, NULL);
 		}
 		/* We have handled this keypress */
 		return true;
@@ -502,7 +502,7 @@ local_history_keypress(struct local_history_session *session, uint32_t key)
 		}
 		/* We have handled this keypress */
 		local_history_scroll_to_cursor(session);
-		guit->corewindow->invalidate(session->core_window_handle, NULL);
+		gui_corewindow_invalidate(session->core_window_handle, NULL);
 		return true;
 	case NS_KEY_UP:
 		/* Go to next sibling up, if there is one */
@@ -531,7 +531,7 @@ local_history_keypress(struct local_history_session *session, uint32_t key)
 		}
 		/* We have handled this keypress */
 		local_history_scroll_to_cursor(session);
-		guit->corewindow->invalidate(session->core_window_handle, NULL);
+		gui_corewindow_invalidate(session->core_window_handle, NULL);
 		return true;
 	}
 	return false;
@@ -549,7 +549,7 @@ local_history_set(struct local_history_session *session,
 		assert(session->bw->history != NULL);
 		session->cursor = bw->history->current;
 
-		guit->corewindow->set_extent(session->core_window_handle,
+		gui_corewindow_set_extent(session->core_window_handle,
 					     session->bw->history->width,
 					     session->bw->history->height);
 		local_history_scroll_to_cursor(session);

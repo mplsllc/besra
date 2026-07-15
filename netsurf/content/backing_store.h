@@ -41,89 +41,45 @@ enum backing_store_flags {
  * objects and their metadata (headers etc) persistent by writing to a
  * backing store using these operations.
  */
-struct gui_llcache_table {
-	/**
-	 * Initialise the backing store.
-	 *
-	 * @param parameters to configure backing store.
-	 * @return NSERROR_OK on success or error code on failure.
-	 */
-	nserror (*initialise)(const struct llcache_store_parameters *parameters);
+/** Initialise the backing store. */
+nserror gui_llcache_initialise(const struct llcache_store_parameters *parameters);
 
-	/**
-	 * Finalise the backing store.
-	 *
-	 * @return NSERROR_OK on success or error code on failure.
-	 */
-	nserror (*finalise)(void);
+/** Finalise the backing store. */
+nserror gui_llcache_finalise(void);
 
-	/**
-	 * Place an object in the backing store.
-	 *
-	 * The object is placed in the persistent store and may be
-	 *  retrieved with the fetch method.
-	 *
-	 * The backing store will take a reference to the
-	 *  passed data, subsequently the caller should explicitly
-	 *  release the allocation using the release method and not
-	 *  free the data itself.
-	 *
-	 * The caller may not assume that the persistent storage has
-	 *  been completely written on return.
-	 *
-	 * @param[in] url The url is used as the unique primary key for the data.
-	 * @param[in] flags The flags to control how the object is stored.
-	 * @param[in] data The objects data.
-	 * @param[in] datalen The length of the \a data.
-	 * @return NSERROR_OK on success or error code on failure.
-	 */
-	nserror (*store)(struct nsurl *url, enum backing_store_flags flags,
-			 uint8_t *data, const size_t datalen);
+/**
+ * Place an object in the backing store.
+ *
+ * The backing store takes a reference to the passed data; the caller should
+ * subsequently release it with gui_llcache_release() and not free it directly.
+ *
+ * @param[in] url The url is used as the unique primary key for the data.
+ * @param[in] flags The flags to control how the object is stored.
+ * @param[in] data The objects data.
+ * @param[in] datalen The length of the \a data.
+ * @return NSERROR_OK on success or error code on failure.
+ */
+nserror gui_llcache_store(struct nsurl *url, enum backing_store_flags flags,
+		 uint8_t *data, const size_t datalen);
 
-	/**
-	 * Retrieve an object from the backing store.
-	 *
-	 * The backing store will manage its own memory and the
-	 * allocations returned in \a data *must* not be altered.
-	 *
-	 * The caller must assume nothing about the backing store
-	 *  allocated buffers and the storage and *must* be freed by
-	 *  calling the release method.
-	 *
-	 * @param[in] url The url is used as the unique primary key for the data.
-	 * @param[in] flags The flags to control how the object is retrieved.
-	 * @param[out] data The retrieved objects data.
-	 * @param[out] datalen The length of the \a data retrieved.
-	 * @return NSERROR_OK on success or error code on failure.
-	 */
-	nserror (*fetch)(struct nsurl *url, enum backing_store_flags flags,
-			 uint8_t **data, size_t *datalen);
+/**
+ * Retrieve an object from the backing store.
+ *
+ * The returned allocation is owned by the backing store and *must* be freed
+ * by calling gui_llcache_release().
+ *
+ * @param[in] url The url is used as the unique primary key for the data.
+ * @param[in] flags The flags to control how the object is retrieved.
+ * @param[out] data The retrieved objects data.
+ * @param[out] datalen The length of the \a data retrieved.
+ * @return NSERROR_OK on success or error code on failure.
+ */
+nserror gui_llcache_fetch(struct nsurl *url, enum backing_store_flags flags,
+		 uint8_t **data, size_t *datalen);
 
-	/**
-	 * release a previously fetched or stored memory object.
-	 *
-	 * @param url The url is used as the unique primary key to invalidate.
-	 * @param[in] flags The flags to control how the object data is released.
-	 * @return NSERROR_OK on success or error code on failure.
-	 */
-	nserror (*release)(struct nsurl *url, enum backing_store_flags flags);
+/** Release a previously fetched or stored memory object. */
+nserror gui_llcache_release(struct nsurl *url, enum backing_store_flags flags);
 
-	/**
-	 * Invalidate a source object from the backing store.
-	 *
-	 * The entry (if present in the backing store) must no longer
-	 * be returned as a result to the fetch or meta operations.
-	 *
-	 * If the entry had data allocated it will be released.
-	 *
-	 * @param url The url is used as the unique primary key to invalidate.
-	 * @return NSERROR_OK on success or error code on failure.
-	 */
-	nserror (*invalidate)(struct nsurl *url);
-
-};
-
-extern struct gui_llcache_table* null_llcache_table;
-extern struct gui_llcache_table* filesystem_llcache_table;
-
+/** Invalidate a source object from the backing store. */
+nserror gui_llcache_invalidate(struct nsurl *url);
 #endif

@@ -21,7 +21,6 @@
 
 #include "netsurf/core_window.h"
 
-extern struct core_window_table *nsgtk_core_window_table;
 
 /**
  * nsgtk core window mouse state

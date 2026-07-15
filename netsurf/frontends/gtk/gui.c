@@ -1185,8 +1185,6 @@ int main(int argc, char** argv)
 	struct netsurf_table nsgtk_table = {
 		.misc = nsgtk_misc_table,
 		.window = nsgtk_window_table,
-		.corewindow = nsgtk_core_window_table,
-		.llcache = filesystem_llcache_table,
 		.bitmap = nsgtk_bitmap_table,
 		.layout = nsgtk_layout_table,
 	};

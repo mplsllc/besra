@@ -1416,8 +1416,8 @@ control_error: /* problem with the control file */
  * @param parameters to configure backing store.
  * @return NSERROR_OK on success or error code on failure.
  */
-static nserror
-initialise(const struct llcache_store_parameters *parameters)
+nserror
+gui_llcache_initialise(const struct llcache_store_parameters *parameters)
 {
 	struct store_state *newstate;
 	nserror ret;
@@ -1522,8 +1522,8 @@ initialise(const struct llcache_store_parameters *parameters)
  *
  * @return NSERROR_OK on success.
  */
-static nserror
-finalise(void)
+nserror
+gui_llcache_finalise(void)
 {
 	int bf; /* block file index */
 	unsigned int op_count;
@@ -1680,8 +1680,8 @@ static nserror store_write_file(struct store_state *state,
  * @param datalen The length of the \a data.
  * @return NSERROR_OK on success or error code on failure.
  */
-static nserror
-store(nsurl *url,
+nserror
+gui_llcache_store(nsurl *url,
       enum backing_store_flags bsflags,
       uint8_t *data,
       const size_t datalen)
@@ -1851,8 +1851,8 @@ static nserror store_read_file(struct store_state *state,
  * @param[out] datalen_out The length of the \a data retrieved.
  * @return NSERROR_OK on success or error code on failure.
  */
-static nserror
-fetch(nsurl *url,
+nserror
+gui_llcache_fetch(nsurl *url,
       enum backing_store_flags bsflags,
       uint8_t **data_out,
       size_t *datalen_out)
@@ -1941,7 +1941,7 @@ fetch(nsurl *url,
  * @param[in] bsflags The flags to control how the object data is released.
  * @return NSERROR_OK on success or error code on failure.
  */
-static nserror release(nsurl *url, enum backing_store_flags bsflags)
+nserror gui_llcache_release(nsurl *url, enum backing_store_flags bsflags)
 {
 	nserror ret;
 	struct store_entry *bse;
@@ -1989,8 +1989,8 @@ static nserror release(nsurl *url, enum backing_store_flags bsflags)
  * @param url The url is used as the unique primary key to invalidate.
  * @return NSERROR_OK on success or error code on failure.
  */
-static nserror
-invalidate(nsurl *url)
+nserror
+gui_llcache_invalidate(nsurl *url)
 {
 	nserror ret;
 	struct store_entry *bse;
@@ -2008,14 +2008,3 @@ invalidate(nsurl *url)
 	return invalidate_entry(storestate, bse);
 }
 
-
-static struct gui_llcache_table llcache_table = {
-	.initialise = initialise,
-	.finalise = finalise,
-	.store = store,
-	.fetch = fetch,
-	.invalidate = invalidate,
-	.release = release,
-};
-
-struct gui_llcache_table *filesystem_llcache_table = &llcache_table;

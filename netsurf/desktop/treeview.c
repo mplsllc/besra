@@ -355,7 +355,7 @@ static inline void treeview__cw_invalidate_area(
 		const struct rect *r)
 {
 	if (tree->cw_h != NULL) {
-		guit->corewindow->invalidate(tree->cw_h, r);
+		gui_corewindow_invalidate(tree->cw_h, r);
 	}
 }
 
@@ -375,7 +375,7 @@ static inline void treeview__cw_full_redraw(
 			.x1 = REDRAW_MAX,
 			.y1 = REDRAW_MAX,
 		};
-		guit->corewindow->invalidate(tree->cw_h, &r);
+		gui_corewindow_invalidate(tree->cw_h, &r);
 	}
 }
 
@@ -406,7 +406,7 @@ static inline void treeview__cw_update_size(
 	int width, int height)
 {
 	if (tree->cw_h != NULL) {
-		guit->corewindow->set_extent(tree->cw_h,
+		gui_corewindow_set_extent(tree->cw_h,
 				     width,
 				     height + treeview__get_search_height(tree));
 	}
@@ -443,7 +443,7 @@ static inline void treeview__cw_get_window_dimensions(
 	int *width, int *height)
 {
 	if (tree->cw_h != NULL) {
-		guit->corewindow->get_dimensions(tree->cw_h, width, height);
+		gui_corewindow_get_dimensions(tree->cw_h, width, height);
 	}
 }
 
@@ -459,7 +459,7 @@ static inline void treeview__cw_drag_status(
 	core_window_drag_status ds)
 {
 	if (tree->cw_h != NULL) {
-		guit->corewindow->drag_status(tree->cw_h, ds);
+		gui_corewindow_drag_status(tree->cw_h, ds);
 	}
 }
 
