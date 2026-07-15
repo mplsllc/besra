@@ -340,7 +340,7 @@ browser_window_download(struct browser_window *bw,
 					NULL, NULL, &l);
 	if (error == NSERROR_NO_FETCH_HANDLER) {
 		/* no internal handler for this type, call out to frontend */
-		error = guit->misc->launch_url(url);
+		error = gui_misc_launch_url(url);
 	} else if (error != NSERROR_OK) {
 		NSLOG(netsurf, INFO, "Failed to fetch download: %d", error);
 	} else {
@@ -962,7 +962,7 @@ browser_window_content_done(struct browser_window *bw)
 	}
 
 	if (bw->refresh_interval != -1) {
-		guit->misc->schedule(bw->refresh_interval * 10,
+		gui_misc_schedule(bw->refresh_interval * 10,
 				     browser_window_refresh, bw);
 	}
 
@@ -1200,7 +1200,7 @@ browser_window__handle_login(struct browser_window *bw,
 		goto out;
 	}
 
-	err = guit->misc->login(url, realm, username, password,
+	err = gui_misc_login(url, realm, username, password,
 				browser_window__handle_userpass_response, bw);
 
 	if (err == NSERROR_NOT_IMPLEMENTED) {
@@ -1846,10 +1846,10 @@ nserror browser_window_destroy_internal(struct browser_window *bw)
 	}
 
 	/* clear any pending callbacks */
-	guit->misc->schedule(-1, browser_window_refresh, bw);
+	gui_misc_schedule(-1, browser_window_refresh, bw);
 	NSLOG(netsurf, INFO,
 	      "Clearing reformat schedule for browser window %p", bw);
-	guit->misc->schedule(-1, scheduled_reformat, bw);
+	gui_misc_schedule(-1, scheduled_reformat, bw);
 
 	/* If this brower window is not the root window, and has focus, unset
 	 * the root browser window's focus pointer. */
@@ -3573,7 +3573,7 @@ navigate_internal_real(struct browser_window *bw,
 		/** \todo does this always try and download even
 		 * unverifiable content?
 		 */
-		res = guit->misc->launch_url(params->url);
+		res = gui_misc_launch_url(params->url);
 		break;
 
 	default: /* report error to user */
@@ -4089,7 +4089,7 @@ void browser_window_stop(struct browser_window *bw)
 		assert(error == NSERROR_OK);
 	}
 
-	guit->misc->schedule(-1, browser_window_refresh, bw);
+	gui_misc_schedule(-1, browser_window_refresh, bw);
 
 	if (bw->children) {
 		children = bw->rows * bw->cols;
@@ -4242,7 +4242,7 @@ nserror browser_window_schedule_reformat(struct browser_window *bw)
 		return NSERROR_BAD_PARAMETER;
 	}
 
-	return guit->misc->schedule(0, scheduled_reformat, bw);
+	return gui_misc_schedule(0, scheduled_reformat, bw);
 }
 
 
@@ -4754,7 +4754,7 @@ nserror browser_window_show_cookies(
 	lwc_string *host = nsurl_get_component(url, NSURL_HOST);
 	const char *string = (host != NULL) ? lwc_string_data(host) : NULL;
 
-	err = guit->misc->present_cookies(string);
+	err = gui_misc_present_cookies(string);
 
 	lwc_string_unref(host);
 	return err;

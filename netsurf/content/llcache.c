@@ -3027,7 +3027,7 @@ static void llcache_persist(void *p)
 				 *  Schedule a check in the future to see if
 				 *  overall performance is too slow to be useful.
 				 */
-				guit->misc->schedule(
+				gui_misc_schedule(
 						llcache->time_quantum * 100,
 						llcache_persist_slowcheck,
 						NULL);
@@ -3081,7 +3081,7 @@ static void llcache_persist(void *p)
 	      total_written, total_elapsed, total_bandwidth);
 
 	NSLOG(llcache, DEBUG, "Rescheduling writeout in %dms", next);
-	guit->misc->schedule(next, llcache_persist, NULL);
+	gui_misc_schedule(next, llcache_persist, NULL);
 }
 
 
@@ -3173,7 +3173,7 @@ static void llcache_fetch_callback(const fetch_msg *msg, void *p)
 
 		(void) llcache_hsts_update_policy(object);
 
-		guit->misc->schedule(5000, llcache_persist, NULL);
+		gui_misc_schedule(5000, llcache_persist, NULL);
 	}
 		break;
 
@@ -3748,7 +3748,7 @@ static void llcache_users_not_caught_up(void)
 {
 	if (llcache->all_caught_up) {
 		llcache->all_caught_up = false;
-		guit->misc->schedule(0, llcache_catch_up_all_users, NULL);
+		gui_misc_schedule(0, llcache_catch_up_all_users, NULL);
 	}
 }
 
@@ -3963,7 +3963,7 @@ void llcache_finalise(void)
 	/* Attempt to persist anything we have left lying around */
 	llcache_persist(NULL);
 	/* Now clear the persistence callback */
-	guit->misc->schedule(-1, llcache_persist, NULL);
+	gui_misc_schedule(-1, llcache_persist, NULL);
 
 	/* Clean uncached objects */
 	for (object = llcache->uncached_objects; object != NULL; object = next) {

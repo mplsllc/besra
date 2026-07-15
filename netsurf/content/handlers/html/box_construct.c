@@ -1311,7 +1311,7 @@ static void convert_xml_to_box(struct box_construct_ctx *ctx)
 	} while (++num_processed < max_processed_before_yield);
 
 	/* More work to do: schedule a continuation */
-	guit->misc->schedule(0, (void *)convert_xml_to_box, ctx);
+	gui_misc_schedule(0, (void *)convert_xml_to_box, ctx);
 }
 
 
@@ -1347,7 +1347,7 @@ dom_to_box(dom_node *n,
 
 	*box_conversion_context = ctx;
 
-	return guit->misc->schedule(0, (void *)convert_xml_to_box, ctx);
+	return gui_misc_schedule(0, (void *)convert_xml_to_box, ctx);
 }
 
 
@@ -1357,7 +1357,7 @@ nserror cancel_dom_to_box(void *box_conversion_context)
 	struct box_construct_ctx *ctx = box_conversion_context;
 	nserror err;
 
-	err = guit->misc->schedule(-1, (void *)convert_xml_to_box, ctx);
+	err = gui_misc_schedule(-1, (void *)convert_xml_to_box, ctx);
 	if (err != NSERROR_OK) {
 		return err;
 	}

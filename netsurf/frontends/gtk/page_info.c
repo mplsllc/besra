@@ -106,7 +106,7 @@ nsgtk_pi_mouse(struct nsgtk_corewindow *nsgtk_cw,
 	if (page_info_mouse_action(pi_win->pi, mouse_state, x, y, &did_something) == NSERROR_OK) {
 		if (did_something == true) {
 			/* Something happened so we need to close ourselves */
-			guit->misc->schedule(0, nsgtk_pi_close_callback, pi_win);
+			gui_misc_schedule(0, nsgtk_pi_close_callback, pi_win);
 		}
 	}
 

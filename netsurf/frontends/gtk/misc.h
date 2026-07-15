@@ -19,6 +19,5 @@
 #ifndef NETSURF_GTK_MISC_H
 #define NETSURF_GTK_MISC_H 1
 
-extern struct gui_misc_table *nsgtk_misc_table;
 
 #endif

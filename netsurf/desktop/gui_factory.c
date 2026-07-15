@@ -235,75 +235,6 @@ static nserror verify_layout_register(struct gui_layout_table *glt)
 	return NSERROR_OK;
 }
 
-static void gui_default_quit(void)
-{
-}
-
-
-static nserror gui_default_launch_url(struct nsurl *url)
-{
-	return NSERROR_NO_FETCH_HANDLER;
-}
-
-
-static nserror gui_default_401login_open(
-	nsurl *url, const char *realm,
-	const char *username, const char *password,
-	nserror (*cb)(nsurl *url, const char * realm,
-		      const char *username,
-		      const char *password,
-		      void *pw),
-	void *cbpw)
-{
-	return NSERROR_NOT_IMPLEMENTED;
-}
-
-static void
-gui_default_pdf_password(char **owner_pass, char **user_pass, char *path)
-{
-	*owner_pass = NULL;
-	save_pdf(path);
-}
-
-static nserror
-gui_default_present_cookies(const char *search_term)
-{
-	return NSERROR_NOT_IMPLEMENTED;
-}
-
-/** verify misc table is valid */
-static nserror verify_misc_register(struct gui_misc_table *gmt)
-{
-	/* check table is present */
-	if (gmt == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-
-	/* check the mandantory fields are set */
-	if (gmt->schedule == NULL) {
-		return NSERROR_BAD_PARAMETER;
-	}
-
-	/* fill in the optional entries with defaults */
-	if (gmt->quit == NULL) {
-		gmt->quit = gui_default_quit;
-	}
-	if (gmt->launch_url == NULL) {
-		gmt->launch_url = gui_default_launch_url;
-	}
-	if (gmt->login == NULL) {
-		gmt->login = gui_default_401login_open;
-	}
-	if (gmt->pdf_password == NULL) {
-		gmt->pdf_password = gui_default_pdf_password;
-	}
-	if (gmt->present_cookies == NULL) {
-		gmt->present_cookies = gui_default_present_cookies;
-	}
-	return NSERROR_OK;
-}
-
-
 /* exported interface documented in netsurf/netsurf.h */
 nserror netsurf_register(struct netsurf_table *gt)
 {
@@ -320,12 +251,6 @@ nserror netsurf_register(struct netsurf_table *gt)
 	}
 
 	/* mandantory tables */
-
-	/* miscellaneous table */
-	err = verify_misc_register(gt->misc);
-	if (err != NSERROR_OK) {
-		return err;
-	}
 
 	/* window table */
 	err = verify_window_register(gt->window);

@@ -781,7 +781,7 @@ void pdf_end(void)
 
 	/*Encryption on*/
 	if (option_enable_PDF_password)
-		guit->misc->pdf_password(&owner_pass, &user_pass,
+		gui_misc_pdf_password(&owner_pass, &user_pass,
 				(void *)settings->output);
 	else
 		save_pdf(settings->output);

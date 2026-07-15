@@ -157,7 +157,7 @@ static void hlcache_clean(void *force_clean_flag)
 	llcache_clean(false);
 
 	/* Re-schedule ourselves */
-	guit->misc->schedule(hlcache->params.bg_clean_time, hlcache_clean, NULL);
+	gui_misc_schedule(hlcache->params.bg_clean_time, hlcache_clean, NULL);
 }
 
 /**
@@ -564,7 +564,7 @@ hlcache_initialise(const struct hlcache_parameters *hlcache_parameters)
 	hlcache->params = *hlcache_parameters;
 
 	/* Schedule the cache cleanup */
-	guit->misc->schedule(hlcache->params.bg_clean_time, hlcache_clean, NULL);
+	gui_misc_schedule(hlcache->params.bg_clean_time, hlcache_clean, NULL);
 
 	return NSERROR_OK;
 }
@@ -573,7 +573,7 @@ hlcache_initialise(const struct hlcache_parameters *hlcache_parameters)
 void hlcache_stop(void)
 {
 	/* Remove the hlcache_clean schedule */
-	guit->misc->schedule(-1, hlcache_clean, NULL);
+	gui_misc_schedule(-1, hlcache_clean, NULL);
 }
 
 /* See hlcache.h for documentation */
@@ -661,7 +661,7 @@ void hlcache_finalise(void)
 	      hlcache->miss_count);
 
 	/* De-schedule ourselves */
-	guit->misc->schedule(-1, hlcache_clean, NULL);
+	gui_misc_schedule(-1, hlcache_clean, NULL);
 
 	free(hlcache);
 	hlcache = NULL;

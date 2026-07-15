@@ -42,6 +42,7 @@
 #include "netsurf/utf8.h"
 #include "netsurf/search.h"
 #include "netsurf/fetch.h"
+#include "netsurf/misc.h"
 
 /* utf8 -------------------------------------------------------------------- */
 
@@ -119,4 +120,26 @@ int gui_fetch_socket_open(int domain, int type, int protocol)
 int gui_fetch_socket_close(int socket)
 {
 	return (int)ns_close_socket(socket);
+}
+
+/* misc ---------------------------------------------------------------------
+ *
+ * The frontend implements schedule and the interactive hooks; quit and login
+ * default to a no-op and an unimplemented credential prompt respectively.
+ */
+
+void gui_misc_quit(void)
+{
+}
+
+nserror gui_misc_login(struct nsurl *url, const char *realm,
+		const char *username, const char *password,
+		nserror (*cb)(struct nsurl *url,
+			      const char *realm,
+			      const char *username,
+			      const char *password,
+			      void *pw),
+		void *cbpw)
+{
+	return NSERROR_NOT_IMPLEMENTED;
 }

@@ -41,7 +41,7 @@
 #include "gtk/misc.h"
 
 
-static nserror gui_launch_url(struct nsurl *url)
+nserror gui_misc_launch_url(struct nsurl *url)
 {
 	gboolean ok;
 	GError *error = NULL;
@@ -137,7 +137,7 @@ static void nsgtk_PDF_no_pass(GtkButton *w, gpointer data)
 	free(path);
 }
 
-static void nsgtk_pdf_password(char **owner_pass, char **user_pass, char *path)
+void gui_misc_pdf_password(char **owner_pass, char **user_pass, char *path)
 {
 	GtkButton *ok, *no;
 	GtkWindow *wnd;
@@ -181,12 +181,15 @@ static void nsgtk_pdf_password(char **owner_pass, char **user_pass, char *path)
 }
 
 
-static struct gui_misc_table misc_table = {
-	.schedule = nsgtk_schedule,
 
-	.launch_url = gui_launch_url,
-	.pdf_password = nsgtk_pdf_password,
-	.present_cookies = nsgtk_cookies_present,
-};
+/* Adapters to the core misc contract for gtk functions used widely under
+ * their own names elsewhere in the frontend. */
+nserror gui_misc_schedule(int t, void (*callback)(void *p), void *p)
+{
+	return nsgtk_schedule(t, callback, p);
+}
 
-struct gui_misc_table *nsgtk_misc_table = &misc_table;
+nserror gui_misc_present_cookies(const char *search_term)
+{
+	return nsgtk_cookies_present(search_term);
+}

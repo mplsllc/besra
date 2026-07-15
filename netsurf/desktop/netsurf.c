@@ -234,7 +234,7 @@ void netsurf_exit(void)
 	hlcache_stop();
 	
 	NSLOG(netsurf, INFO, "Closing GUI");
-	guit->misc->quit();
+	gui_misc_quit();
 
 	NSLOG(netsurf, INFO, "Finalising page-info module");
 	page_info_fini();

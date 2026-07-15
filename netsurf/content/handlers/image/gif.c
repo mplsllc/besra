@@ -189,7 +189,7 @@ static nserror gif__animate(gif_content *gif, bool redraw)
 
 	/* Continue animating if we should */
 	if (nsoption_bool(animate_images) && delay != NSGIF_INFINITE) {
-		guit->misc->schedule(delay * 10, gif_animate_cb, gif);
+		gui_misc_schedule(delay * 10, gif_animate_cb, gif);
 	}
 
 	if (redraw) {
@@ -314,7 +314,7 @@ static void gif_destroy(struct content *c)
 	gif_content *gif = (gif_content *) c;
 
 	/* Free all the associated memory buffers */
-	guit->misc->schedule(-1, gif_animate_cb, c);
+	gui_misc_schedule(-1, gif_animate_cb, c);
 	nsgif_destroy(gif->gif);
 }
 
@@ -373,7 +373,7 @@ static void gif_remove_user(struct content *c)
 {
 	if (content_count_users(c) == 1) {
 		/* Last user is about to be removed from this content, so stop the animation. */
-		guit->misc->schedule(-1, gif_animate_cb, c);
+		gui_misc_schedule(-1, gif_animate_cb, c);
 	}
 }
 

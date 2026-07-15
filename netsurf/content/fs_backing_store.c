@@ -921,7 +921,7 @@ get_store_entry(struct store_state *state, nsurl *url, struct store_entry **bse)
 
 	state->entries_dirty = true;
 
-	guit->misc->schedule(CONTROL_MAINT_TIME, control_maintenance, state);
+	gui_misc_schedule(CONTROL_MAINT_TIME, control_maintenance, state);
 
 	return NSERROR_OK;
 }
@@ -1035,7 +1035,7 @@ set_store_entry(struct store_state *state,
 
 	/* ensure control maintenance scheduled. */
 	state->entries_dirty = true;
-	guit->misc->schedule(CONTROL_MAINT_TIME, control_maintenance, state);
+	gui_misc_schedule(CONTROL_MAINT_TIME, control_maintenance, state);
 
 	*bse = se;
 
@@ -1529,7 +1529,7 @@ gui_llcache_finalise(void)
 	unsigned int op_count;
 
 	if (storestate != NULL) {
-		guit->misc->schedule(-1, control_maintenance, storestate);
+		gui_misc_schedule(-1, control_maintenance, storestate);
 		write_entries(storestate);
 		write_blocks(storestate);
 

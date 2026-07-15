@@ -354,7 +354,7 @@ html_object_callback(hlcache_handle *object,
 	case CONTENT_MSG_REFRESH:
 		if (content_get_type(object) == CONTENT_HTML) {
 			/* only for HTML objects */
-			guit->misc->schedule(event->data.delay * 1000,
+			gui_misc_schedule(event->data.delay * 1000,
 					html_object_refresh, o);
 		}
 
@@ -674,7 +674,7 @@ nserror html_object_close_objects(html_content *html)
 			continue;
 
 		if (content_get_type(object->content) == CONTENT_HTML) {
-			guit->misc->schedule(-1, html_object_refresh, object);
+			gui_misc_schedule(-1, html_object_refresh, object);
 		}
 
 		content_close(object->content);
@@ -693,7 +693,7 @@ nserror html_object_free_objects(html_content *html)
 			NSLOG(netsurf, INFO, "object %p", victim->content);
 
 			if (content_get_type(victim->content) == CONTENT_HTML) {
-				guit->misc->schedule(-1, html_object_refresh, victim);
+				gui_misc_schedule(-1, html_object_refresh, victim);
 			}
 			hlcache_handle_release(victim->content);
 		}

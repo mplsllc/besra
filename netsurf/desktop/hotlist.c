@@ -170,7 +170,7 @@ static void hotlist_schedule_save_cb(void *p)
 static nserror hotlist_schedule_save(void)
 {
 	if (hl_ctx.save_scheduled == false && hl_ctx.save_path != NULL) {
-		nserror err = guit->misc->schedule(10 * 1000,
+		nserror err = gui_misc_schedule(10 * 1000,
 				hotlist_schedule_save_cb, NULL);
 		if (err != NSERROR_OK) {
 			return err;
@@ -1391,7 +1391,7 @@ nserror hotlist_fini(void)
 	NSLOG(netsurf, INFO, "Finalising hotlist");
 
 	/* Remove any existing scheduled save callback */
-	guit->misc->schedule(-1, hotlist_schedule_save_cb, NULL);
+	gui_misc_schedule(-1, hotlist_schedule_save_cb, NULL);
 	hl_ctx.save_scheduled = false;
 
 	/* Save the hotlist */
