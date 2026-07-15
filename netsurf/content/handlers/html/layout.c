@@ -113,7 +113,6 @@ const css_border_color_func border_color_funcs[4] = {
 /* forward declaration to break cycles */
 static void layout_minmax_block(
 		struct box *block,
-		const struct gui_layout_table *font_func,
 		const html_content *content);
 
 /**
@@ -249,13 +248,11 @@ static int layout_text_indent(
  * Calculate minimum and maximum width of a table.
  *
  * \param table box of type TABLE
- * \param font_func Font functions
  * \param content  The HTML content we are laying out.
  * \post  table->min_width and table->max_width filled in,
  *        0 <= table->min_width <= table->max_width
  */
 static void layout_minmax_table(struct box *table,
-		const struct gui_layout_table *font_func,
 		const html_content *content)
 {
 	unsigned int i, j;
@@ -313,7 +310,7 @@ static void layout_minmax_table(struct box *table,
 		if (cell->columns != 1)
 			continue;
 
-		layout_minmax_block(cell, font_func, content);
+		layout_minmax_block(cell, content);
 		i = cell->start_column;
 
 		if (col[i].positioned)
@@ -336,7 +333,7 @@ static void layout_minmax_table(struct box *table,
 		if (cell->columns == 1)
 			continue;
 
-		layout_minmax_block(cell, font_func, content);
+		layout_minmax_block(cell, content);
 		i = cell->start_column;
 
 		/* find min width so far of spanned columns, and count
@@ -455,7 +452,6 @@ static inline bool box_has_percentage_max_width(struct box *b)
  * \param line_max    updated to maximum width of line starting at first
  * \param first_line  true iff this is the first line in the inline container
  * \param line_has_height  updated to true or false, depending on line
- * \param font_func Font functions.
  * \return  first box in next line, or 0 if no more lines
  * \post  0 <= *line_min <= *line_max
  */
@@ -465,7 +461,6 @@ layout_minmax_line(struct box *first,
 		   int *line_max,
 		   bool first_line,
 		   bool *line_has_height,
-		   const struct gui_layout_table *font_func,
 		   const html_content *content)
 {
 	int min = 0, max = 0, width, height, fixed;
@@ -508,10 +503,10 @@ layout_minmax_line(struct box *first,
 		if (lh__box_is_float_box(b)) {
 			assert(b->children);
 			if (b->children->type == BOX_TABLE)
-				layout_minmax_table(b->children, font_func,
+				layout_minmax_table(b->children,
 						content);
 			else
-				layout_minmax_block(b->children, font_func,
+				layout_minmax_block(b->children,
 						content);
 			b->min_width = b->children->min_width;
 			b->max_width = b->children->max_width;
@@ -522,7 +517,7 @@ layout_minmax_line(struct box *first,
 		}
 
 		if (b->type == BOX_INLINE_BLOCK || b->type == BOX_INLINE_FLEX) {
-			layout_minmax_block(b, font_func, content);
+			layout_minmax_block(b, content);
 			if (min < b->min_width)
 				min = b->min_width;
 			max += b->max_width;
@@ -562,7 +557,7 @@ layout_minmax_line(struct box *first,
 
 			if (b->next) {
 				if (b->space == UNKNOWN_WIDTH) {
-					font_func->width(&fstyle, " ", 1,
+					gui_layout_width(&fstyle, " ", 1,
 							 &b->space);
 				}
 				max += b->space;
@@ -598,7 +593,7 @@ layout_minmax_line(struct box *first,
 							data.select.items; o;
 							o = o->next) {
 						int opt_width;
-						font_func->width(&fstyle,
+						gui_layout_width(&fstyle,
 								o->text,
 								strlen(o->text),
 								&opt_width);
@@ -612,7 +607,7 @@ layout_minmax_line(struct box *first,
 						b->width += SCROLLBAR_WIDTH;
 
 				} else {
-					font_func->width(&fstyle, b->text,
+					gui_layout_width(&fstyle, b->text,
 						b->length, &b->width);
 					b->flags |= MEASURED;
 				}
@@ -620,7 +615,7 @@ layout_minmax_line(struct box *first,
 			max += b->width;
 			if (b->next) {
 				if (b->space == UNKNOWN_WIDTH) {
-					font_func->width(&fstyle, " ", 1,
+					gui_layout_width(&fstyle, " ", 1,
 							 &b->space);
 				}
 				max += b->space;
@@ -647,7 +642,7 @@ layout_minmax_line(struct box *first,
 					for (j = i; j != b->length &&
 							b->text[j] != ' '; j++)
 						;
-					font_func->width(&fstyle, b->text + i,
+					gui_layout_width(&fstyle, b->text + i,
 							 j - i, &width);
 					if (min < width)
 						min = width;
@@ -803,14 +798,12 @@ layout_minmax_line(struct box *first,
  *
  * \param inline_container  box of type INLINE_CONTAINER
  * \param[out] has_height set to true if container has height
- * \param font_func Font functions.
  * \post  inline_container->min_width and inline_container->max_width filled in,
  *        0 <= inline_container->min_width <= inline_container->max_width
  */
 static void
 layout_minmax_inline_container(struct box *inline_container,
 			       bool *has_height,
-			       const struct gui_layout_table *font_func,
 			       const html_content *content)
 {
 	struct box *child;
@@ -829,7 +822,7 @@ layout_minmax_inline_container(struct box *inline_container,
 
 	for (child = inline_container->children; child; ) {
 		child = layout_minmax_line(child, &line_min, &line_max,
-				first_line, &line_has_height, font_func,
+				first_line, &line_has_height,
 				content);
 		if (min < line_min)
 			min = line_min;
@@ -851,14 +844,12 @@ layout_minmax_inline_container(struct box *inline_container,
  * Calculate minimum and maximum width of a block.
  *
  * \param block  box of type BLOCK, INLINE_BLOCK, or TABLE_CELL
- * \param font_func font functions
  * \param content The HTML content being layed out.
  * \post  block->min_width and block->max_width filled in,
  *        0 <= block->min_width <= block->max_width
  */
 static void layout_minmax_block(
 		struct box *block,
-		const struct gui_layout_table *font_func,
 		const html_content *content)
 {
 	struct box *child;
@@ -942,7 +933,7 @@ static void layout_minmax_block(
 	if (block->object) {
 		if (content_get_type(block->object) == CONTENT_HTML) {
 			layout_minmax_block(html_get_box_tree(block->object),
-					font_func, content);
+					content);
 			min = html_get_box_tree(block->object)->min_width;
 			max = html_get_box_tree(block->object)->max_width;
 		} else {
@@ -960,7 +951,7 @@ static void layout_minmax_block(
 			switch (child->type) {
 			case BOX_FLEX:
 			case BOX_BLOCK:
-				layout_minmax_block(child, font_func,
+				layout_minmax_block(child,
 						content);
 				if (child->flags & HAS_HEIGHT)
 					child_has_height = true;
@@ -970,7 +961,7 @@ static void layout_minmax_block(
 					child->flags |= NEED_MIN;
 
 				layout_minmax_inline_container(child,
-						&child_has_height, font_func,
+						&child_has_height,
 						content);
 				if (child_has_height &&
 						child ==
@@ -979,7 +970,7 @@ static void layout_minmax_block(
 				}
 				break;
 			case BOX_TABLE:
-				layout_minmax_table(child, font_func,
+				layout_minmax_table(child,
 						content);
 				/* todo: fix for zero height tables */
 				child_has_height = true;
@@ -2354,7 +2345,6 @@ layout_text_box_split(html_content *content,
 {
 	int space_width = split_box->space;
 	struct box *c2;
-	const struct gui_layout_table *font_func = content->font_func;
 	bool space = (split_box->text[new_length] == ' ');
 	int used_length = new_length + (space ? 1 : 0);
 
@@ -2362,7 +2352,7 @@ layout_text_box_split(html_content *content,
 		/* We're need to add a space, and we don't know how big
 		 * it's to be, OR we have a space of unknown width anyway;
 		 * Calculate space width */
-		font_func->width(fstyle, " ", 1, &space_width);
+		gui_layout_width(fstyle, " ", 1, &space_width);
 	}
 
 	if (split_box->space == UNKNOWN_WIDTH)
@@ -2731,7 +2721,6 @@ layout_line(struct box *first,
 	int space_before = 0, space_after = 0;
 	unsigned int inline_count = 0;
 	unsigned int i;
-	const struct gui_layout_table *font_func = content->font_func;
 	plot_font_style_t fstyle;
 
 	NSLOG(layout, DEBUG,
@@ -2843,7 +2832,7 @@ layout_line(struct box *first,
 		} else if (b->type == BOX_INLINE_END) {
 			b->width = 0;
 			if (b->space == UNKNOWN_WIDTH) {
-				font_func->width(&fstyle, " ", 1, &b->space);
+				gui_layout_width(&fstyle, " ", 1, &b->space);
 				/** \todo handle errors */
 			}
 			space_after = b->space;
@@ -2882,7 +2871,7 @@ layout_line(struct box *first,
 							data.select.items; o;
 							o = o->next) {
 						int opt_width;
-						font_func->width(&fstyle,
+						gui_layout_width(&fstyle,
 								o->text,
 								strlen(o->text),
 								&opt_width);
@@ -2894,7 +2883,7 @@ layout_line(struct box *first,
 					if (nsoption_bool(core_select_menu))
 						b->width += SCROLLBAR_WIDTH;
 				} else {
-					font_func->width(&fstyle, b->text,
+					gui_layout_width(&fstyle, b->text,
 							b->length, &b->width);
 					b->flags |= MEASURED;
 				}
@@ -2907,14 +2896,14 @@ layout_line(struct box *first,
 			if (b->text && (x + b->width < x1 - x0) &&
 					!(b->flags & MEASURED) &&
 					b->next) {
-				font_func->width(&fstyle, b->text,
+				gui_layout_width(&fstyle, b->text,
 						 b->length, &b->width);
 				b->flags |= MEASURED;
 			}
 
 			x += b->width;
 			if (b->space == UNKNOWN_WIDTH) {
-				font_func->width(&fstyle, " ", 1, &b->space);
+				gui_layout_width(&fstyle, " ", 1, &b->space);
 				/** \todo handle errors */
 			}
 			space_after = b->space;
@@ -3050,7 +3039,7 @@ layout_line(struct box *first,
 							&content->unit_len_ctx,
 							b->style, &fstyle);
 					/** \todo handle errors */
-					font_func->width(&fstyle, " ", 1,
+					gui_layout_width(&fstyle, " ", 1,
 							 &b->space);
 				}
 				space_after = b->space;
@@ -3204,7 +3193,7 @@ layout_line(struct box *first,
 			font_plot_style_from_css(&content->unit_len_ctx,
 					split_box->style, &fstyle);
 			/** \todo handle errors */
-			font_func->split(&fstyle,
+			gui_layout_split(&fstyle,
 					 split_box->text,
 					 split_box->length,
 					 x1 - x0 - x - space_before,
@@ -4426,7 +4415,7 @@ layout_lists(const html_content *content, struct box *box)
 							&content->unit_len_ctx,
 							marker->style,
 							&fstyle);
-					content->font_func->width(&fstyle,
+					gui_layout_width(&fstyle,
 							marker->text,
 							marker->length,
 							&marker->width);
@@ -5397,13 +5386,12 @@ bool layout_document(html_content *content, int width, int height)
 {
 	bool ret;
 	struct box *doc = content->layout;
-	const struct gui_layout_table *font_func = content->font_func;
 
 	NSLOG(layout, DEBUG, "Doing layout to %ix%i of %s",
 			width, height, nsurl_access(content_get_url(
 					&content->base)));
 
-	layout_minmax_block(doc, font_func, content);
+	layout_minmax_block(doc, content);
 
 	layout_block_find_dimensions(&content->unit_len_ctx,
 			width, height, 0, 0, doc);

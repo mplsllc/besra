@@ -305,7 +305,7 @@ static nserror page_info__measure_text_entry(
 	nserror err;
 	int height_px;
 
-	err = guit->layout->width(pit->style,
+	err = gui_layout_width(pit->style,
 			pit->text, strlen(pit->text),
 			&pit->width);
 	if (err != NSERROR_OK) {

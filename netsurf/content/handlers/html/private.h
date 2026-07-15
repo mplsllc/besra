@@ -31,7 +31,6 @@
 #include "content/handlers/css/utils.h"
 
 
-struct gui_layout_table;
 struct scrollbar_msg_data;
 struct content_redraw_data;
 struct selection;
@@ -142,7 +141,6 @@ typedef struct html_content {
 	colour background_colour;
 
 	/** Font callback table */
-	const struct gui_layout_table *font_func;
 
 	/** Number of entries in scripts */
 	unsigned int scripts_count;

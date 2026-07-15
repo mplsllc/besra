@@ -416,7 +416,7 @@ static void textplain_reformat(struct content *c, int width, int height)
 	/* compute available columns (assuming monospaced font) - use 8
 	 * characters for better accuracy
 	 */
-	res = guit->layout->width(&textplain_style,
+	res = gui_layout_width(&textplain_style,
 				  "ABCDEFGH", 8,
 				  &character_width);
 	if (res != NSERROR_OK) {
@@ -647,7 +647,7 @@ textplain_offset_from_coords(struct content *c, int x, int y, int dir)
 		}
 
 		if (next_offset < length) {
-			guit->layout->width(&textplain_style,
+			gui_layout_width(&textplain_style,
 					    text,
 					    next_offset,
 					    &width);
@@ -657,7 +657,7 @@ textplain_offset_from_coords(struct content *c, int x, int y, int dir)
 			int pixel_offset;
 			size_t char_offset;
 
-			guit->layout->position(&textplain_style,
+			gui_layout_position(&textplain_style,
 					       text, next_offset, x,
 					       &char_offset, &pixel_offset);
 
@@ -903,7 +903,7 @@ text_draw(const char *utf8_text,
 				endtxt_idx = utf8_len;
 			}
 
-			res = guit->layout->width(&textplain_style,
+			res = gui_layout_width(&textplain_style,
 						  utf8_text,
 						  start_idx,
 						  &startx);
@@ -911,7 +911,7 @@ text_draw(const char *utf8_text,
 				startx = 0;
 			}
 
-			res = guit->layout->width(&textplain_style,
+			res = gui_layout_width(&textplain_style,
 						  utf8_text,
 						  endtxt_idx,
 						  &endx);
@@ -1139,7 +1139,7 @@ textplain_redraw(struct content *c,
 			if (next_offset >= length)
 				break;
 
-			res = guit->layout->width(&textplain_style,
+			res = gui_layout_width(&textplain_style,
 						  &text_d[offset],
 						  next_offset - offset,
 						  &width);
@@ -1277,7 +1277,7 @@ textplain_coord_from_offset(const char *text, size_t offset, size_t length)
 			next_offset = utf8_next(text, length, next_offset);
 		}
 
-		guit->layout->width(&textplain_style, text, next_offset, &tx);
+		gui_layout_width(&textplain_style, text, next_offset, &tx);
 
 		x += tx;
 

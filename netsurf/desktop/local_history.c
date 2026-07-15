@@ -193,7 +193,7 @@ redraw_entry(struct history *history,
 		ctx->plot->rectangle(ctx, &pstyle_rect_cursor, &rect);
 	}
 
-	res = guit->layout->position(plot_style_font, entry->page.title,
+	res = gui_layout_position(plot_style_font, entry->page.title,
 				     strlen(entry->page.title), LOCAL_HISTORY_WIDTH,
 				     &char_offset, &actual_x);
 	if (res != NSERROR_OK) {

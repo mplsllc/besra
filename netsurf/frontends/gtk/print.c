@@ -709,7 +709,6 @@ void gtk_print_signal_begin_print (GtkPrintOperation *operation,
 	settings->page_width = gtk_print_context_get_width(context);
 	settings->page_height = gtk_print_context_get_height(context);
 	settings->scale = 0.7; /* at 0.7 the pages look the best */
-	settings->font_func = nsgtk_layout_table;
 	
 	if (print_set_up(content_to_print, &gtk_printer, 
 			 settings, &height_to_print) == false) {

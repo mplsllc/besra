@@ -37,7 +37,6 @@
 
 struct hlcache_handle;
 struct printer;
-struct gui_layout_table;
 
 enum { MARGINLEFT = 0, MARGINRIGHT = 1, MARGINTOP = 2, MARGINBOTTOM = 3};
 
@@ -60,7 +59,6 @@ struct print_settings{
 	const char *output;
 
 	/*the functions used to measure fonts*/
-	const struct gui_layout_table *font_func;
 
 	/* Private data for the plotter context */
 	void *priv;
@@ -79,7 +77,7 @@ bool print_cleanup(struct hlcache_handle *, const struct printer *,
 /**
  * Setup print settings for print render operation.
  */
-struct print_settings *print_make_settings(print_configuration configuration, const char *url, const struct gui_layout_table *font_func);
+struct print_settings *print_make_settings(print_configuration configuration, const char *url);
 
 /*is the content currently redrawn for printing?*/
 extern bool html_redraw_printing;

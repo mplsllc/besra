@@ -247,12 +247,11 @@ bool print_cleanup(hlcache_handle *content, const struct printer *printer,
  *
  * \param configuration the requested configuration
  * \param filename the filename or NULL
- * \param font_func font handling functions
  * \return print_settings in case if successful, NULL if unknown
  *                        configuration or lack of memory.
  */
 struct print_settings *print_make_settings(print_configuration configuration,
-		const char *filename, const struct gui_layout_table *font_func)
+		const char *filename)
 {
 	struct print_settings *settings;
 	css_fixed length = 0;
@@ -320,7 +319,6 @@ struct print_settings *print_make_settings(print_configuration configuration,
 	}
 
 	/* Set font functions */
-	settings->font_func = font_func;
 
 	/* Output filename, or NULL if printing */
 	if (filename != NULL) {

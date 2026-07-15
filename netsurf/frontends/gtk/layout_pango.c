@@ -62,8 +62,8 @@ static inline void nsfont_pango_check(void)
  * \param[out] width updated to width of string[0..length)
  * \return NSERROR_OK and width updated or appropriate error code on faliure
  */
-static nserror
-nsfont_width(const plot_font_style_t *fstyle,
+nserror
+gui_layout_width(const plot_font_style_t *fstyle,
 	     const char *string,
 	     size_t length,
 	     int *width)
@@ -164,8 +164,8 @@ layout_position(PangoLayout *layout,
  * \return NSERROR_OK and char_offset and actual_x updated or appropriate
  *          error code on faliure
  */
-static nserror
-nsfont_position_in_string(const plot_font_style_t *fstyle,
+nserror
+gui_layout_position(const plot_font_style_t *fstyle,
 			  const char *string,
 			  size_t length,
 			  int x,
@@ -218,8 +218,8 @@ nsfont_position_in_string(const plot_font_style_t *fstyle,
  *
  * Returning char_offset == length means no split possible
  */
-static nserror
-nsfont_split(const plot_font_style_t *fstyle,
+nserror
+gui_layout_split(const plot_font_style_t *fstyle,
 	     const char *string,
 	     size_t length,
 	     int x,
@@ -391,11 +391,3 @@ nsfont_style_to_description(const plot_font_style_t *fstyle)
 
 	return desc;
 }
-
-static struct gui_layout_table layout_table = {
-	.width = nsfont_width,
-	.position = nsfont_position_in_string,
-	.split = nsfont_split,
-};
-
-struct gui_layout_table *nsgtk_layout_table = &layout_table;

@@ -18,7 +18,6 @@ class CanvasRenderingContext2D {
       prologue %{
 /* prologue */
 #include "desktop/gui_internal.h"
-#include "desktop/gui_table.h"
 #include "netsurf/bitmap.h"
 #include "utils/corestrings.h"
 /* It's a smidge naughty of us to read

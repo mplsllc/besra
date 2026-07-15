@@ -26,16 +26,7 @@
 #define _NETSURF_NETSURF_H_
 
 #include "utils/errors.h"
-#include "desktop/gui_table.h"
 
-/**
- * Register operation table.
- *
- * @param table NetSurf operations table.
- * @return NSERROR_OK on success or error code on faliure. On faliure
- *                    global table will not be initialised.
- */
-nserror netsurf_register(struct netsurf_table *table);
 
 /**
  * Initialise netsurf core.

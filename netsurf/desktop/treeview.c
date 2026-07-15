@@ -1181,7 +1181,7 @@ treeview_insert_node(
 		/* Parent is expanded, so inserted node will be visible and
 		 * affect layout */
 		if (a->text.width == 0) {
-			guit->layout->width(&plot_style_odd.text,
+			gui_layout_width(&plot_style_odd.text,
 					    a->text.data,
 					    a->text.len,
 					    &(a->text.width));
@@ -1288,7 +1288,7 @@ treeview_update_node_folder(treeview *tree,
 
 	if (folder->parent->flags & TV_NFLAGS_EXPANDED) {
 		/* Text will be seen, get its width */
-		guit->layout->width(&plot_style_odd.text,
+		gui_layout_width(&plot_style_odd.text,
 				    folder->text.data,
 				    folder->text.len,
 				    &(folder->text.width));
@@ -1339,7 +1339,7 @@ treeview_update_node_entry(treeview *tree,
 
 	if (entry->parent->flags & TV_NFLAGS_EXPANDED) {
 		/* Text will be seen, get its width */
-		guit->layout->width(&plot_style_odd.text,
+		gui_layout_width(&plot_style_odd.text,
 				    entry->text.data,
 				    entry->text.len,
 				    &(entry->text.width));
@@ -1359,7 +1359,7 @@ treeview_update_node_entry(treeview *tree,
 
 		if (entry->flags & TV_NFLAGS_EXPANDED) {
 			/* Text will be seen, get its width */
-			guit->layout->width(&plot_style_odd.text,
+			gui_layout_width(&plot_style_odd.text,
 					    e->fields[i - 1].value.data,
 					    e->fields[i - 1].value.len,
 					    &(e->fields[i - 1].value.width));
@@ -2066,7 +2066,7 @@ treeview_create(treeview **treeout,
 		f->value.data = lwc_string_data(fields[fldidx].field);
 		f->value.len = lwc_string_length(fields[fldidx].field);
 
-		guit->layout->width(&plot_style_odd.text,
+		gui_layout_width(&plot_style_odd.text,
 				    f->value.data,
 				    f->value.len,
 				    &(f->value.width));
@@ -2222,7 +2222,7 @@ treeview_node_expand_internal(treeview *tree, treeview_node *node)
 
 		do {
 			if (child->text.width == 0) {
-				guit->layout->width(&plot_style_odd.text,
+				gui_layout_width(&plot_style_odd.text,
 						    child->text.data,
 						    child->text.len,
 						    &(child->text.width));
@@ -2243,7 +2243,7 @@ treeview_node_expand_internal(treeview *tree, treeview_node *node)
 		for (i = 0; i < tree->n_fields - 1; i++) {
 
 			if (e->fields[i].value.width == 0) {
-				guit->layout->width(&plot_style_odd.text,
+				gui_layout_width(&plot_style_odd.text,
 						    e->fields[i].value.data,
 						    e->fields[i].value.len,
 						    &(e->fields[i].value.width));

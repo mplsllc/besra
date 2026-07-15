@@ -30,7 +30,6 @@
 
 struct box;
 struct html_content;
-struct gui_layout_table;
 
 /**
  * Calculate positions of boxes in a document.

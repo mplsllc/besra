@@ -27,11 +27,9 @@
 #ifndef _NETSURF_DESKTOP_GUI_INTERNAL_H_
 #define _NETSURF_DESKTOP_GUI_INTERNAL_H_
 
-#include "desktop/gui_table.h"
 
 /**
  * The global operation table.
  */
-extern struct netsurf_table *guit;
 
 #endif

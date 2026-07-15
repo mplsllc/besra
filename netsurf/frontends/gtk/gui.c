@@ -1182,17 +1182,6 @@ int main(int argc, char** argv)
 {
 	nserror res;
 	char *cache_home = NULL;
-	struct netsurf_table nsgtk_table = {
-		.layout = nsgtk_layout_table,
-	};
-
-	res = netsurf_register(&nsgtk_table);
-	if (res != NSERROR_OK) {
-		fprintf(stderr,
-			"NetSurf operation table failed registration (%s)\n",
-			messages_get_errorcode(res));
-		return 1;
-	}
 
 	/* gtk specific initialisation */
 	res = nsgtk_init(&argc, &argv, &cache_home);

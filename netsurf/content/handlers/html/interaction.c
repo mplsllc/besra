@@ -214,7 +214,7 @@ static size_t html_selection_drag_end(struct html_content *html,
 
 		font_plot_style_from_css(&html->unit_len_ctx, box->style, &fstyle);
 
-		guit->layout->position(&fstyle, box->text, box->length,
+		gui_layout_position(&fstyle, box->text, box->length,
 				       dx, &idx, &pixel_offset);
 
 		idx += box->byte_offset;
@@ -427,7 +427,7 @@ mouse_action_drag_selection(html_content *html,
 	if (box != NULL) {
 		font_plot_style_from_css(&html->unit_len_ctx, box->style, &fstyle);
 
-		guit->layout->position(&fstyle,
+		gui_layout_position(&fstyle,
 				       box->text,
 				       box->length,
 				       dx,
@@ -1225,7 +1225,7 @@ default_mouse_action(html_content *html,
 					 mas->text.box->style,
 					 &fstyle);
 
-		guit->layout->position(&fstyle,
+		gui_layout_position(&fstyle,
 				       mas->text.box->text,
 				       mas->text.box->length,
 				       x - mas->text.box_x,

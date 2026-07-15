@@ -220,14 +220,14 @@ text_redraw(const char *utf8_text,
 				endtxt_idx = utf8_len;
 			}
 
-			res = guit->layout->width(fstyle,
+			res = gui_layout_width(fstyle,
 						  utf8_text, start_idx,
 						  &startx);
 			if (res != NSERROR_OK) {
 				startx = 0;
 			}
 
-			res = guit->layout->width(fstyle,
+			res = gui_layout_width(fstyle,
 						  utf8_text, endtxt_idx,
 						  &endx);
 			if (res != NSERROR_OK) {
@@ -554,7 +554,7 @@ static bool html_redraw_file(int x, int y, int width, int height,
 	}
 	length = strlen(text);
 
-	res = guit->layout->width(&fstyle, text, length, &text_width);
+	res = gui_layout_width(&fstyle, text, length, &text_width);
 	if (res != NSERROR_OK) {
 		return false;
 	}
@@ -1792,7 +1792,7 @@ bool html_redraw_box(const html_content *html, struct box *box,
 				return false;
 			}
 
-			res = guit->layout->width(plot_fstyle_broken_object,
+			res = gui_layout_width(plot_fstyle_broken_object,
 						  obj,
 						  sizeof(obj) - 1,
 						  &obj_width);

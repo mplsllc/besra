@@ -489,7 +489,6 @@ html_create_html_data(html_content *c, const http_parameter *params)
 	c->frameset = NULL;
 	c->iframe = NULL;
 	c->page = NULL;
-	c->font_func = guit->layout;
 	c->drag_type = HTML_DRAG_NONE;
 	c->drag_owner.no_owner = true;
 	c->selection_type = HTML_SELECTION_NONE;

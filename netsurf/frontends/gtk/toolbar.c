@@ -2285,8 +2285,7 @@ pdf_button_clicked_cb(GtkWidget *widget, gpointer data)
 	haru_nsfont_set_scale((float)option_export_scale / 100);
 
 	settings = print_make_settings(PRINT_OPTIONS,
-				       (const char *) filename,
-				       &haru_nsfont);
+				       (const char *) filename);
 	g_free(filename);
 	if (settings == NULL) {
 		return TRUE;
@@ -2393,8 +2392,7 @@ print_button_clicked_cb(GtkWidget *widget, gpointer data)
 	gtk_print_operation_set_default_page_setup(print_op, page_setup);
 
 	nssettings = print_make_settings(PRINT_DEFAULT,
-					 NULL,
-					 nsgtk_layout_table);
+					 NULL);
 
 	g_signal_connect(print_op,
 			 "begin_print",

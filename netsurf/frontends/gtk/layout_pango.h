@@ -28,7 +28,6 @@
 
 struct plot_font_style;
 
-extern struct gui_layout_table *nsgtk_layout_table;
 
 nserror nsfont_paint(int x, int y, const char *string, size_t length, const struct plot_font_style *fstyle);
 
