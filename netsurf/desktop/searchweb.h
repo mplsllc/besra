@@ -28,19 +28,13 @@ struct bitmap;
 struct nsurl;
 
 /**
- * Graphical user interface browser web search function table.
+ * Called when the search provider details are updated.
  *
+ * \param provider_name The name of the provider.
+ * \param ico_bitmap The bitmap of the search icon may be NULL
+ * if no icon is yet available.
  */
-struct gui_search_web_table {
-	/**
-	 * called when the search provider details are updated.
-	 *
-	 * \param provider_name The name of the provider.
-	 * \param ico_bitmap The bitmap of the search icon may be NULL
-	 * if no icon is yet available.
-	 */
-	nserror (*provider_update)(const char *provider_name, struct bitmap *ico_bitmap);
-};
+nserror gui_search_web_provider_update(const char *provider_name, struct bitmap *ico_bitmap);
 
 /**
  * Flags which alter the behaviour of the omin search.

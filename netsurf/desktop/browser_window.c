@@ -1773,27 +1773,27 @@ browser_window_callback(hlcache_handle *c, const hlcache_event *event, void *pw)
 	case CONTENT_MSG_TEXTSEARCH:
 		switch (event->data.textsearch.type) {
 		case CONTENT_TEXTSEARCH_FIND:
-			guit->search->hourglass(event->data.textsearch.state,
+			gui_search_hourglass(event->data.textsearch.state,
 						event->data.textsearch.ctx);
 			break;
 
 		case CONTENT_TEXTSEARCH_MATCH:
-			guit->search->status(event->data.textsearch.state,
+			gui_search_status(event->data.textsearch.state,
 					     event->data.textsearch.ctx);
 			break;
 
 		case CONTENT_TEXTSEARCH_BACK:
-			guit->search->back_state(event->data.textsearch.state,
+			gui_search_back_state(event->data.textsearch.state,
 						 event->data.textsearch.ctx);
 			break;
 
 		case CONTENT_TEXTSEARCH_FORWARD:
-			guit->search->forward_state(event->data.textsearch.state,
+			gui_search_forward_state(event->data.textsearch.state,
 						    event->data.textsearch.ctx);
 			break;
 
 		case CONTENT_TEXTSEARCH_RECENT:
-			guit->search->add_recent(event->data.textsearch.string,
+			gui_search_add_recent(event->data.textsearch.string,
 						 event->data.textsearch.ctx);
 
 			break;

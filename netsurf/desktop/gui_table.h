@@ -29,11 +29,8 @@
 
 struct gui_misc_table;
 struct gui_window_table;
-struct gui_download_table;
 struct gui_fetch_table;
 struct gui_file_table;
-struct gui_search_table;
-struct gui_search_web_table;
 struct gui_llcache_table;
 struct gui_bitmap_table;
 struct gui_layout_table;
@@ -73,13 +70,6 @@ struct netsurf_table {
 	struct core_window_table *corewindow;
 
 	/**
-	 * Download table.
-	 *
-	 * operations table for the download windows.
-	 */
-	struct gui_download_table *download;
-
-	/**
 	 * Fetcher table
 	 *
 	 * The table is mandantory and must be provided.
@@ -95,23 +85,6 @@ struct netsurf_table {
 	 * default posix compliant operations will be used.
 	 */
 	struct gui_file_table *file;
-
-	/**
-	 * Page search table.
-	 *
-	 * Provides routines for the interactive text search on a page.
-	 */
-	struct gui_search_table *search;
-
-	/**
-	 * Web search table.
-	 *
-	 * Used by the web search provider system.
-	 *
-	 * The table is optional and may be NULL which uses the
-	 * default empty implementation.
-	 */
-	struct gui_search_web_table *search_web;
 
 	/**
 	 * Low level cache table.

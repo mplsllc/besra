@@ -31,11 +31,13 @@
  */
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 
 #include "utils/errors.h"
 #include "netsurf/utf8.h"
+#include "netsurf/search.h"
 
 /* utf8 -------------------------------------------------------------------- */
 
@@ -67,4 +69,22 @@ nserror gui_utf8_utf8_to_local(const char *string, size_t len, char **result)
 nserror gui_utf8_local_to_utf8(const char *string, size_t len, char **result)
 {
 	return gui_default_utf8(string, len, result);
+}
+
+/* page search --------------------------------------------------------------
+ *
+ * The frontend implements forward_state/back_state; the remaining notifiers
+ * default to no-ops (a frontend need not surface search status/history).
+ */
+
+void gui_search_status(bool found, void *p)
+{
+}
+
+void gui_search_hourglass(bool active, void *p)
+{
+}
+
+void gui_search_add_recent(const char *string, void *p)
+{
 }

@@ -24,7 +24,6 @@
 #ifndef NETSURF_GTK_SEARCH_H_
 #define NETSURF_GTK_SEARCH_H_
 
-extern struct gui_search_table *nsgtk_search_table;
 
 struct gtk_search;
 

@@ -155,7 +155,7 @@ static nserror download_context_process_headers(download_context *ctx)
 	}
 
 	/* Create the frontend window */
-	ctx->window = guit->download->create(ctx, ctx->parent);
+	ctx->window = gui_download_create(ctx, ctx->parent);
 	if (ctx->window == NULL) {
 		free(ctx->filename);
 		ctx->filename = NULL;
@@ -208,7 +208,7 @@ static nserror download_callback(llcache_handle *handle,
 
 		if (error == NSERROR_OK) {
 			/** \todo Lose ugly cast */
-			error = guit->download->data(ctx->window,
+			error = gui_download_data(ctx->window,
 					(char *) event->data.data.buf,
 					event->data.data.len);
 			if (error != NSERROR_OK)
@@ -220,7 +220,7 @@ static nserror download_callback(llcache_handle *handle,
 	case LLCACHE_EVENT_DONE:
 		/* There may be no associated window if there was no data or headers */
 		if (ctx->window != NULL)
-			guit->download->done(ctx->window);
+			gui_download_done(ctx->window);
 		else
 			download_context_destroy(ctx);
 
@@ -228,7 +228,7 @@ static nserror download_callback(llcache_handle *handle,
 
 	case LLCACHE_EVENT_ERROR:
 		if (ctx->window != NULL)
-			guit->download->error(ctx->window, event->data.error.msg);
+			gui_download_error(ctx->window, event->data.error.msg);
 		else
 			download_context_destroy(ctx);
 

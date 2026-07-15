@@ -1558,7 +1558,7 @@ static void gui_window_set_title(struct gui_window *gw, const char *title)
  * \param bitmap The bitmap representing the provider.
  * \return NSERROR_OK on success else error code.
  */
-static nserror
+nserror
 gui_search_web_provider_update(const char *name, struct bitmap *bitmap)
 {
 	struct gui_window *gw;
@@ -1583,12 +1583,6 @@ gui_search_web_provider_update(const char *name, struct bitmap *bitmap)
 /**
  * GTK frontend web search operation table
  */
-static struct gui_search_web_table search_web_table = {
-	.provider_update = gui_search_web_provider_update,
-};
-
-struct gui_search_web_table *nsgtk_search_web_table = &search_web_table;
-
 
 /**
  * GTK frontend browser window operation table

@@ -292,7 +292,7 @@ search_web_ico_callback(hlcache_handle *ico,
 	case CONTENT_MSG_DONE:
 		NSLOG(netsurf, INFO, "icon '%s' retrieved",
 		      nsurl_access(hlcache_handle_get_url(ico)));
-		guit->search_web->provider_update(provider->name,
+		gui_search_web_provider_update(provider->name,
 						  content_get_bitmap(ico));
 		break;
 
@@ -441,7 +441,7 @@ nserror search_web_select_provider(const char *selection)
 	/* signal the frontend with the provider change. Bitmap may
 	 * be NULL at this point.
 	 */
-	guit->search_web->provider_update(provider->name, ico_bitmap);
+	gui_search_web_provider_update(provider->name, ico_bitmap);
 
 	/* if the providers icon has not been retrieved get it now */
 	if (provider->ico_handle == NULL) {
@@ -487,7 +487,7 @@ default_ico_callback(hlcache_handle *ico,
 
 		/* only set to default icon if providers icon has no handle */
 		if (ctx->providers[search_web_ctx.current].ico_handle == NULL) {
-			guit->search_web->provider_update(
+			gui_search_web_provider_update(
 				ctx->providers[search_web_ctx.current].name,
 				content_get_bitmap(ico));
 		}

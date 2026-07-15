@@ -780,8 +780,8 @@ nsgtk_download_gsourcefunc__nsgtk_download_update(gpointer user_data)
 /**
  * core callback on creating a new download
  */
-static struct gui_download_window *
-gui_download_window_create(download_context *ctx, struct gui_window *gui)
+struct gui_download_window *
+gui_download_create(download_context *ctx, struct gui_window *gui)
 {
 	nsurl *url;
 	unsigned long long int total_size;
@@ -882,8 +882,8 @@ gui_download_window_create(download_context *ctx, struct gui_window *gui)
 /**
  * core callback on receipt of data
  */
-static nserror
-gui_download_window_data(struct gui_download_window *dw,
+nserror
+gui_download_data(struct gui_download_window *dw,
 			 const char *data,
 			 unsigned int size)
 {
@@ -911,8 +911,8 @@ gui_download_window_data(struct gui_download_window *dw,
 /**
  * core callback on error
  */
-static void
-gui_download_window_error(struct gui_download_window *dw, const char *error_msg)
+void
+gui_download_error(struct gui_download_window *dw, const char *error_msg)
 {
 }
 
@@ -920,7 +920,7 @@ gui_download_window_error(struct gui_download_window *dw, const char *error_msg)
 /**
  * core callback when core download is complete
  */
-static void gui_download_window_done(struct gui_download_window *dw)
+void gui_download_done(struct gui_download_window *dw)
 {
 	g_io_channel_shutdown(dw->write, TRUE, &dw->error);
 	g_io_channel_unref(dw->write);
@@ -939,15 +939,6 @@ static void gui_download_window_done(struct gui_download_window *dw)
 	}
 }
 
-
-static struct gui_download_table download_table = {
-	.create = gui_download_window_create,
-	.data = gui_download_window_data,
-	.error = gui_download_window_error,
-	.done = gui_download_window_done,
-};
-
-struct gui_download_table *nsgtk_download_table = &download_table;
 
 
 /* exported interface documented in gtk/download.h */

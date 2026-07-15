@@ -57,8 +57,9 @@ struct gtk_search {
  * \param active activate/inactivate
  * \param search the gtk search context
  */
-static void nsgtk_search_set_forward_state(bool active, struct gtk_search *search)
+void gui_search_forward_state(bool active, void *p)
 {
+	struct gtk_search *search = p;
 	gtk_widget_set_sensitive(GTK_WIDGET(search->forward), active);
 }
 
@@ -69,8 +70,9 @@ static void nsgtk_search_set_forward_state(bool active, struct gtk_search *searc
  * \param active activate/inactivate
  * \param search the gtk search context
  */
-static void nsgtk_search_set_back_state(bool active, struct gtk_search *search)
+void gui_search_back_state(bool active, void *p)
 {
+	struct gtk_search *search = p;
 	gtk_widget_set_sensitive(GTK_WIDGET(search->back), active);
 }
 
@@ -212,13 +214,6 @@ nsgtk_search_entry_key(GtkWidget *widget, GdkEventKey *event, gpointer data)
 	return FALSE;
 }
 
-
-static struct gui_search_table search_table = {
-	.forward_state = (void *)nsgtk_search_set_forward_state,
-	.back_state = (void *)nsgtk_search_set_back_state,
-};
-
-struct gui_search_table *nsgtk_search_table = &search_table;
 
 
 /* exported interface documented in gtk/scaffolding.h */
