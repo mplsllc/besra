@@ -5,6 +5,7 @@ add_executable(netsurf-qt6
     stubs.cpp
     schedule.cpp
     layout.cpp
+    plotters.cpp
 )
 
 target_link_libraries(netsurf-qt6 PRIVATE
