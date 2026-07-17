@@ -211,6 +211,3 @@ extern "C" nserror gui_search_web_provider_update(const char *provider_name, str
     return NSERROR_OK;
 }
 
-extern "C" nserror gui_misc_schedule(int t, void (*callback)(void *p), void *p) {
-    return NSERROR_OK;
-}

@@ -3,6 +3,7 @@ find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
 add_executable(netsurf-qt6
     main.cpp
     stubs.cpp
+    schedule.cpp
 )
 
 target_link_libraries(netsurf-qt6 PRIVATE

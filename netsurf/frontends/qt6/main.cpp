@@ -2,6 +2,7 @@
 
 extern "C" {
 #include <netsurf/netsurf.h>
+void schedule_run(void);
 }
 
 int main(int argc, char *argv[])
@@ -13,5 +14,11 @@ int main(int argc, char *argv[])
     // which serves as our Qt6 implementation worklist.
     netsurf_init(NULL);
     
-    return app.exec();
+    // Custom event loop to emulate GTK's batching queue draining at a known point
+    while (true) {
+        app.processEvents(QEventLoop::WaitForMoreEvents);
+        schedule_run();
+    }
+    
+    return 0;
 }
