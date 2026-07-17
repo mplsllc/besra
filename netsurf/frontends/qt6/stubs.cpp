@@ -23,17 +23,7 @@ extern "C" void gui_search_back_state(bool active, void *p) {
     
 }
 
-extern "C" nserror gui_layout_width(const struct plot_font_style *fstyle, const char *string, size_t length, int *width) {
-    return NSERROR_OK;
-}
 
-extern "C" nserror gui_layout_position(const struct plot_font_style *fstyle, const char *string, size_t length, int x, size_t *char_offset, int *actual_x) {
-    return NSERROR_OK;
-}
-
-extern "C" nserror gui_layout_split(const struct plot_font_style *fstyle, const char *string, size_t length, int x, size_t *char_offset, int *actual_x) {
-    return NSERROR_OK;
-}
 
 extern "C" struct gui_window * gui_window_create(struct browser_window *bw,
 		struct gui_window *existing,
