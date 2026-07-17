@@ -25,31 +25,11 @@ extern "C" void gui_search_back_state(bool active, void *p) {
 
 
 
-extern "C" struct gui_window * gui_window_create(struct browser_window *bw,
-		struct gui_window *existing,
-		gui_window_create_flags flags) {
-    return NULL;
-}
 
-extern "C" void gui_window_destroy(struct gui_window *gw) {
-    
-}
 
-extern "C" nserror gui_window_invalidate(struct gui_window *gw, const struct rect *rect) {
-    return NSERROR_OK;
-}
 
-extern "C" bool gui_window_get_scroll(struct gui_window *gw, int *sx, int *sy) {
-    return false;
-}
 
-extern "C" nserror gui_window_set_scroll(struct gui_window *gw, const struct rect *rect) {
-    return NSERROR_OK;
-}
 
-extern "C" nserror gui_window_get_dimensions(struct gui_window *gw, int *width, int *height) {
-    return NSERROR_OK;
-}
 
 extern "C" nserror gui_window_event(struct gui_window *gw, enum gui_window_event event) {
     return NSERROR_OK;
