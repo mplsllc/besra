@@ -1,50 +1,14 @@
 #include <QFont>
-#include <QFontMetrics>
 #include <QString>
+#include <QTextLayout>
+
+#include "qt_font.h"
 
 extern "C" {
 #include "utils/errors.h"
 #include "utils/log.h"
 #include "netsurf/layout.h"
 #include "netsurf/plot_style.h"
-}
-
-static QFont qt_font(const plot_font_style_t *fstyle) {
-    QFont font;
-    switch (fstyle->family) {
-    case PLOT_FONT_FAMILY_SERIF:
-        font.setStyleHint(QFont::Serif);
-        break;
-    case PLOT_FONT_FAMILY_MONOSPACE:
-        font.setStyleHint(QFont::Monospace);
-        break;
-    case PLOT_FONT_FAMILY_CURSIVE:
-        font.setStyleHint(QFont::Cursive);
-        break;
-    case PLOT_FONT_FAMILY_FANTASY:
-        font.setStyleHint(QFont::Fantasy);
-        break;
-    case PLOT_FONT_FAMILY_SANS_SERIF:
-    default:
-        font.setStyleHint(QFont::SansSerif);
-        break;
-    }
-
-    qreal ptSize = (qreal)fstyle->size / PLOT_STYLE_SCALE;
-    font.setPointSizeF(ptSize);
-    font.setWeight(QFont::Weight(fstyle->weight));
-
-    if (fstyle->flags & FONTF_ITALIC) {
-        font.setStyle(QFont::StyleItalic);
-    } else if (fstyle->flags & FONTF_OBLIQUE) {
-        font.setStyle(QFont::StyleOblique);
-    }
-
-    if (fstyle->flags & FONTF_SMALLCAPS) {
-        font.setCapitalization(QFont::SmallCaps);
-    }
-
-    return font;
 }
 
 extern "C" nserror gui_layout_width(const struct plot_font_style *fstyle, const char *string, size_t length, int *width) {
@@ -54,39 +18,48 @@ extern "C" nserror gui_layout_width(const struct plot_font_style *fstyle, const 
     }
     
     QFont font = qt_font(fstyle);
-    QFontMetrics fm(font);
-    
     QString qs = QString::fromUtf8(string, length);
-    *width = fm.horizontalAdvance(qs);
+    
+    QTextLayout layout(qs, font);
+    layout.beginLayout();
+    QTextLine line = layout.createLine();
+    if (line.isValid()) {
+        line.setLineWidth(1e9);
+    }
+    layout.endLayout();
+    
+    if (line.isValid()) {
+        *width = line.naturalTextWidth();
+    } else {
+        *width = 0;
+    }
     
     return NSERROR_OK;
 }
 
 static nserror layout_position_internal(const plot_font_style_t *fstyle, const char *string, size_t length, int x, size_t *char_offset, int *actual_x) {
     QFont font = qt_font(fstyle);
-    QFontMetrics fm(font);
     QString qs = QString::fromUtf8(string, length);
     
-    int low = 0;
-    int high = qs.length();
-    int best_offset = 0;
-    int best_x = 0;
+    QTextLayout layout(qs, font);
+    layout.beginLayout();
+    QTextLine line = layout.createLine();
+    if (line.isValid()) {
+        line.setLineWidth(1e9);
+    }
+    layout.endLayout();
     
-    while (low <= high) {
-        int mid = low + (high - low) / 2;
-        int w = fm.horizontalAdvance(qs.left(mid));
-        
-        if (w <= x) {
-            best_offset = mid;
-            best_x = w;
-            low = mid + 1;
-        } else {
-            high = mid - 1;
-        }
+    if (!line.isValid()) {
+        *char_offset = 0;
+        *actual_x = 0;
+        return NSERROR_OK;
     }
     
-    *char_offset = qs.left(best_offset).toUtf8().length();
-    *actual_x = best_x;
+    int cursor = line.xToCursor(x, QTextLine::CursorOnCharacter);
+    qreal ax = line.cursorToX(cursor);
+    
+    *char_offset = qs.left(cursor).toUtf8().length();
+    *actual_x = ax;
     
     return NSERROR_OK;
 }
@@ -132,10 +105,9 @@ extern "C" nserror gui_layout_split(const struct plot_font_style *fstyle, const 
     
     *char_offset = str_len;
     
-    QFont font = qt_font(fstyle);
-    QFontMetrics fm(font);
-    QString qs = QString::fromUtf8(string, str_len);
-    *actual_x = fm.horizontalAdvance(qs);
+    // We must recalculate actual_x at the new offset to give an honest width.
+    // It's cheaper to just measure it since we know exactly where we split.
+    gui_layout_width(fstyle, string, str_len, actual_x);
     
     return NSERROR_OK;
 }
