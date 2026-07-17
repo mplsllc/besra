@@ -1,7 +1,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
 extern "C" {
+#include "netsurf/netsurf.h"
 #include "utils/errors.h"
+#include "utils/nsurl.h"
 #include "netsurf/bitmap.h"
 #include "netsurf/clipboard.h"
 #include "netsurf/core_window.h"
@@ -68,15 +71,19 @@ extern "C" void gui_window_file_gadget_open(struct gui_window *gw, struct hlcach
 }
 
 extern "C" const char * gui_fetch_filetype(const char *unix_path) {
-    return NULL;
+    return "text/html";
 }
 
 extern "C" struct nsurl * gui_fetch_get_resource_url(const char *path) {
-    return NULL;
+    struct nsurl *url = NULL;
+    char buf[1024];
+    snprintf(buf, sizeof(buf), "file:///tmp/%s", path);
+    nsurl_create(buf, &url);
+    return url;
 }
 
 extern "C" nserror gui_fetch_get_resource_data(const char *path, const uint8_t **data, size_t *data_len) {
-    return NSERROR_OK;
+    return NSERROR_NOT_FOUND;
 }
 
 extern "C" void gui_clipboard_get(char **buffer, size_t *length) {

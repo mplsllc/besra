@@ -9,12 +9,33 @@ extern "C" {
 #include <netsurf/content.h>
 #include <netsurf/browser_window.h>
 #include <content/fetch.h>
+#include <utils/nsoption.h>
+#include <desktop/bitmap.h>
 void schedule_run(void);
+}
+
+static nserror set_defaults(struct nsoption_s *defaults)
+{
+    nsoption_set_charp(font_sans, strdup("Sans"));
+    nsoption_set_charp(font_serif, strdup("Serif"));
+    nsoption_set_charp(font_mono, strdup("Monospace"));
+    nsoption_set_charp(font_cursive, strdup("Serif"));
+    nsoption_set_charp(font_fantasy, strdup("Serif"));
+    return NSERROR_OK;
 }
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    
+    nsoption_init(set_defaults, &nsoptions, &nsoptions_default);
+    
+    // Set bitmap format to match Qt's Format_ARGB32_Premultiplied
+    bitmap_fmt_t fmt = {
+        .layout = BITMAP_LAYOUT_ARGB8888,
+        .pma = true,
+    };
+    bitmap_set_format(&fmt);
     
     // Call a core entry point to force the linker to resolve all core dependencies.
     netsurf_init(NULL);
