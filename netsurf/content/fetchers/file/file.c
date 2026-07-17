@@ -46,7 +46,7 @@
 
 #include "netsurf/inttypes.h"
 #include "utils/nsurl.h"
-#include "utils/dirent.h"
+#include <dirent.h>
 #include "utils/corestrings.h"
 #include "utils/messages.h"
 #include "utils/utils.h"

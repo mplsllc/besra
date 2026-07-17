@@ -88,22 +88,4 @@ nserror gui_fetch_release_resource_data(const uint8_t *data);
  */
 char *gui_fetch_mimetype(const char *ro_path);
 
-/**
- * Open a socket
- *
- * \param domain Communication domain
- * \param type Socket type
- * \param protocol Protocol
- * \return Socket descriptor on success, -1 on error and errno set
- */
-int gui_fetch_socket_open(int domain, int type, int protocol);
-
-/**
- * Close a socket
- *
- * \param socket Socket descriptor
- * \return 0 on success, -1 on error and errno set
- */
-int gui_fetch_socket_close(int socket);
-
 #endif

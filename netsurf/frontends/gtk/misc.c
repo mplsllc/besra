@@ -35,7 +35,7 @@
 
 #include "gtk/compat.h"
 #include "gtk/warn.h"
-#include "gtk/schedule.h"
+
 #include "gtk/resources.h"
 #include "gtk/cookies.h"
 #include "gtk/misc.h"
@@ -181,13 +181,6 @@ void gui_misc_pdf_password(char **owner_pass, char **user_pass, char *path)
 }
 
 
-
-/* Adapters to the core misc contract for gtk functions used widely under
- * their own names elsewhere in the frontend. */
-nserror gui_misc_schedule(int t, void (*callback)(void *p), void *p)
-{
-	return nsgtk_schedule(t, callback, p);
-}
 
 nserror gui_misc_present_cookies(const char *search_term)
 {

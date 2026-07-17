@@ -54,7 +54,7 @@
 #include "gtk/window.h"
 #include "gtk/compat.h"
 #include "gtk/resources.h"
-#include "gtk/schedule.h"
+
 #include "gtk/local_history.h"
 #include "gtk/global_history.h"
 #include "gtk/viewsource.h"
@@ -3300,7 +3300,7 @@ static void next_throbber_frame(void *p)
 
 	/* only schedule next frame if there are no errors */
 	if (res == NSERROR_OK) {
-		nsgtk_schedule(THROBBER_FRAME_TIME, next_throbber_frame, p);
+		gui_misc_schedule(THROBBER_FRAME_TIME, next_throbber_frame, p);
 	}
 }
 
@@ -3434,7 +3434,7 @@ static void toolbar_destroy_cb(GtkWidget *widget, gpointer data)
 	tb = (struct nsgtk_toolbar *)data;
 
 	/* ensure any throbber scheduled is stopped */
-	nsgtk_schedule(-1, next_throbber_frame, tb);
+	gui_misc_schedule(-1, next_throbber_frame, tb);
 
 	free(tb);
 }
@@ -3570,7 +3570,7 @@ nserror nsgtk_toolbar_throbber(struct nsgtk_toolbar *tb, bool active)
 
 	/* when activating the throbber simply schedule the next frame update */
 	if (active) {
-		nsgtk_schedule(THROBBER_FRAME_TIME, next_throbber_frame, tb);
+		gui_misc_schedule(THROBBER_FRAME_TIME, next_throbber_frame, tb);
 
 		set_item_sensitivity(&tb->items[STOP_BUTTON], true);
 		set_item_sensitivity(&tb->items[RELOAD_BUTTON], false);
@@ -3580,7 +3580,7 @@ nserror nsgtk_toolbar_throbber(struct nsgtk_toolbar *tb, bool active)
 	}
 
 	/* stopping the throbber */
-	nsgtk_schedule(-1, next_throbber_frame, tb);
+	gui_misc_schedule(-1, next_throbber_frame, tb);
 	tb->throb_frame = 0;
 	res =  set_throbber_frame(tb->items[THROBBER_ITEM].button,
 				  tb->throb_frame);

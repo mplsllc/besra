@@ -66,7 +66,7 @@
 #include "gtk/scaffolding.h"
 #include "gtk/window.h"
 #include "gtk/corewindow.h"
-#include "gtk/schedule.h"
+
 #include "gtk/selection.h"
 #include "gtk/search.h"
 #include "gtk/bitmap.h"
@@ -1069,8 +1069,6 @@ static void nsgtk_main(void)
 
 		while (gtk_events_pending())
 			gtk_main_iteration_do(TRUE);
-
-		schedule_run();
 
 		fetch_fdset(&read_fd_set, &write_fd_set, &exc_fd_set, &max_fd);
 		for (int i = 0; i <= max_fd; i++) {

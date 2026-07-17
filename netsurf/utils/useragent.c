@@ -22,7 +22,7 @@
 #include <string.h>
 
 #include "utils/config.h"
-#include "utils/utsname.h"
+#include <sys/utsname.h>
 #include "desktop/version.h"
 #include "utils/log.h"
 #include "utils/useragent.h"

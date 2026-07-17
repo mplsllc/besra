@@ -38,7 +38,10 @@
 #include <unistd.h>
 
 #include "utils/errors.h"
-#include "utils/inet.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/select.h>
 #include "netsurf/utf8.h"
 #include "netsurf/search.h"
 #include "netsurf/fetch.h"
@@ -111,16 +114,6 @@ nserror gui_fetch_release_resource_data(const uint8_t *data)
 char *gui_fetch_mimetype(const char *ro_path)
 {
 	return strdup(gui_fetch_filetype(ro_path));
-}
-
-int gui_fetch_socket_open(int domain, int type, int protocol)
-{
-	return (int)socket(domain, type, protocol);
-}
-
-int gui_fetch_socket_close(int socket)
-{
-	return (int)ns_close_socket(socket);
 }
 
 /* misc ---------------------------------------------------------------------

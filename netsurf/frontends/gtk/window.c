@@ -57,7 +57,7 @@
 #include "gtk/toolbar.h"
 #include "gtk/local_history.h"
 #include "gtk/plotters.h"
-#include "gtk/schedule.h"
+
 #include "gtk/tabs.h"
 #include "gtk/bitmap.h"
 #include "gtk/gdk.h"
@@ -809,7 +809,7 @@ static void next_throbber_frame(void *p)
 	if (res == NSERROR_OK) {
 		nsgtk_tab_set_icon(gw->container, pixbuf);
 		/* only schedule next frame if there are no errors */
-		nsgtk_schedule(THROBBER_FRAME_TIME, next_throbber_frame, p);
+		gui_misc_schedule(THROBBER_FRAME_TIME, next_throbber_frame, p);
 	}
 }
 
@@ -1016,7 +1016,7 @@ void gui_window_destroy(struct gui_window *gw)
 	NSLOG(netsurf, INFO, "scaffolding: %p", gw->scaffold);
 
 	/* kill off any throbber that might be running */
-	nsgtk_schedule(-1, next_throbber_frame, gw);
+	gui_misc_schedule(-1, next_throbber_frame, gw);
 
 	/* remove from window list */
 	if (gw->prev) {
@@ -1461,9 +1461,9 @@ static nserror throbber(struct gui_window *gw, bool active)
 	nsgtk_toolbar_throbber(gw->toolbar, active);
 	nsgtk_scaffolding_throbber(gw, active);
 	if (active) {
-		nsgtk_schedule(THROBBER_FRAME_TIME, next_throbber_frame, gw);
+		gui_misc_schedule(THROBBER_FRAME_TIME, next_throbber_frame, gw);
 	} else {
-		nsgtk_schedule(-1, next_throbber_frame, gw);
+		gui_misc_schedule(-1, next_throbber_frame, gw);
 		gw->throb_frame = 0;
 		/* set tab back to favicon */
 		nsgtk_tab_set_icon(gw->container, gw->icon);

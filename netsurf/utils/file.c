@@ -37,7 +37,7 @@
 #include "utils/nsurl.h"
 #include "utils/string.h"
 #include "utils/file.h"
-#include "utils/dirent.h"
+#include <dirent.h>
 
 #ifdef nsamiga
 #include "frontends/amiga/os3support.h"

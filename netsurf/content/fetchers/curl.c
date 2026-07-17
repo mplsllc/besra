@@ -28,7 +28,10 @@
  */
 
 /* must come first to ensure winsock2.h vs windows.h ordering issues */
-#include "utils/inet.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/select.h>
 
 #include <assert.h>
 #include <errno.h>
@@ -1798,7 +1801,7 @@ static curl_socket_t fetch_curl_socket_open(void *clientp,
 	(void) clientp;
 	(void) purpose;
 
-	return (curl_socket_t) gui_fetch_socket_open(
+	return (curl_socket_t) socket(
 			address->family, address->socktype,
 			address->protocol);
 }
@@ -1807,7 +1810,7 @@ static int fetch_curl_socket_close(void *clientp, curl_socket_t item)
 {
 	(void) clientp;
 
-	return gui_fetch_socket_close((int) item);
+	return close((int) item);
 }
 
 /**

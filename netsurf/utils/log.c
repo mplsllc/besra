@@ -21,8 +21,8 @@
 
 #include "utils/config.h"
 #include "utils/nsoption.h"
-#include "utils/sys_time.h"
-#include "utils/utsname.h"
+#include <sys/time.h>
+#include <sys/utsname.h>
 #include "desktop/version.h"
 
 #include "utils/log.h"

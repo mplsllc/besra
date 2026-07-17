@@ -98,7 +98,10 @@
 #include <nspsl.h>
 #endif
 
-#include "utils/inet.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/select.h>
 #include "utils/nsoption.h"
 #include "utils/log.h"
 #include "utils/corestrings.h"
