@@ -137,45 +137,6 @@ extern "C" nserror gui_corewindow_drag_status(struct core_window *cw,
     return NSERROR_OK;
 }
 
-extern "C" void * gui_bitmap_create(int width, int height, enum gui_bitmap_flags flags) {
-    return NULL;
-}
-
-extern "C" void gui_bitmap_destroy(void *bitmap) {
-    
-}
-
-extern "C" void gui_bitmap_set_opaque(void *bitmap, bool opaque) {
-    
-}
-
-extern "C" bool gui_bitmap_get_opaque(void *bitmap) {
-    return false;
-}
-
-extern "C" unsigned char * gui_bitmap_get_buffer(void *bitmap) {
-    return NULL;
-}
-
-extern "C" size_t gui_bitmap_get_rowstride(void *bitmap) {
-    return 0;
-}
-
-extern "C" int gui_bitmap_get_width(void *bitmap) {
-    return 0;
-}
-
-extern "C" int gui_bitmap_get_height(void *bitmap) {
-    return 0;
-}
-
-extern "C" void gui_bitmap_modified(void *bitmap) {
-    
-}
-
-extern "C" nserror gui_bitmap_render(struct bitmap *bitmap, struct hlcache_handle *content) {
-    return NSERROR_OK;
-}
 
 extern "C" nserror gui_search_web_provider_update(const char *provider_name, struct bitmap *ico_bitmap) {
     return NSERROR_OK;

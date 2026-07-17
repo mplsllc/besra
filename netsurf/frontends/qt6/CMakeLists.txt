@@ -7,6 +7,7 @@ add_executable(netsurf-qt6
     layout.cpp
     plotters.cpp
     window.cpp
+    bitmap.cpp
 )
 
 target_link_libraries(netsurf-qt6 PRIVATE
