@@ -10,3 +10,7 @@ target_link_libraries(netsurf-qt6 PRIVATE
     Qt6::Widgets
     netsurf
 )
+
+target_include_directories(netsurf-qt6 PRIVATE
+    ${CMAKE_SOURCE_DIR}/netsurf
+)

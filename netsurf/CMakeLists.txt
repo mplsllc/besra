@@ -76,6 +76,7 @@ target_link_libraries(netsurf PUBLIC
     ${OPENSSL_LIBRARIES}
     ${PNG_LIBRARIES}
     ${JPEG_LIBRARIES}
+    ZLIB::ZLIB
 )
 target_include_directories(netsurf PUBLIC
     ${CURL_INCLUDE_DIRS}
@@ -89,6 +90,15 @@ target_compile_options(netsurf PUBLIC
     ${PNG_CFLAGS}
     ${JPEG_CFLAGS}
 )
+option(BESRA_BUILD_TESTS "Build tests" OFF)
+set(BESRA_FRONTEND "gtk3" CACHE STRING "Frontend to build (gtk3 or qt6)")
+set_property(CACHE BESRA_FRONTEND PROPERTY STRINGS "gtk3" "qt6")
 if(UNIX)
-    add_subdirectory(frontends/qt6)
+    if(BESRA_FRONTEND STREQUAL "gtk3")
+        add_subdirectory(frontends/gtk)
+    elseif(BESRA_FRONTEND STREQUAL "qt6")
+        add_subdirectory(frontends/qt6)
+    else()
+        message(FATAL_ERROR "Unknown BESRA_FRONTEND: ${BESRA_FRONTEND}")
+    endif()
 endif()
