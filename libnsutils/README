@@ -7,29 +7,12 @@ Overview
   Libnsutils provides a small number of useful utility routines which
   require platform-specific implementations.
 
-Requirements
-------------
+Building
+--------
 
-  Libnsutils requires the following tools:
-
-    + A C99 capable C compiler
-    + GNU make or compatible
-    + Pkg-config
-
-Compilation
------------
-
-  If necessary, modify the toolchain settings in the Makefile.
-  Invoke make:
-  		$ make
-
-Verification
-------------
-
-  To verify that the library is working, it is necessary to specify a 
-  different makefile target than that used for normal compilation, thus:
-  
-  		$ make test
+  Libnsutils is vendored into Besra and built as part of the top-level
+  CMake build (see CLAUDE.md at the repo root); it is not built or
+  installed standalone.
 
 API documentation
 -----------------

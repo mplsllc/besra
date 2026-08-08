@@ -53,11 +53,25 @@ vision/strategy and roadmap, and `CLAUDE.md` for architecture and build notes.
     flagged since Step 4). `netsurf/CMakeLists.txt` no longer has a frontend choice.
   - Build target renamed `netsurf-qt6` → `besra`.
 
+* **Step 5:** Vendored libraries (`libwapcaplet`, `libparserutils`, `libhubbub`,
+  `libdom`, `libcss`, `libnsgif`, `libnsbmp`, `libnsutils`, `libnspsl`, `libsvgtiny`)
+  no longer carry the "independent project" pretense. Earlier in Step 5, each lib's
+  dead standalone build scaffolding (`Makefile`, `Makefile.config`, `libFOO.pc.in`,
+  superseded entirely by the per-lib `CMakeLists.txt` from Step 3) was removed. This
+  pass finished the job: 7 of the 10 READMEs (libwapcaplet, libparserutils, libhubbub,
+  libdom, libcss, libsvgtiny, libnsutils) still described a standalone GNU-make build,
+  down to `svn co`-ing sibling libraries and installing to `/usr/local` — actively
+  wrong now, not just stale (e.g. libhubbub's README told you to fetch and build your
+  own separate libparserutils). Replaced those sections with a short, accurate note
+  pointing at the top-level CMake build; kept the genuinely-still-useful content
+  (overview, rationale, API usage, test-driver pointers). Also cleared out stray local
+  `build/` artifact directories (already gitignored, never tracked, just disk clutter).
+  No source-tree/`#include`-path merge was done — the per-lib `include/<name>/` +
+  `src/` layout stays as-is; that's a large, high-risk, low-value mechanical rewrite
+  with no concrete benefit distinct from what's already fixed here.
+
 ## Upcoming
 
-* **Step 5:** Vendor the libraries (`libwapcaplet`, `libdom`, etc.) in as real flattened
-  source, dropping the "independent projects" pretense (CMakeLists.txt per lib are already
-  in place as of Step 3; this is the source-tree flattening itself).
 * **Known follow-ups from Step 6** (functional but with an honest gap, not fake):
   - Bookmarks (hotlist) has no persistence path yet: in-memory only for the session.
   - Favicon rendering (`gui_window_set_icon`) is a no-op.

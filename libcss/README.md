@@ -7,45 +7,14 @@ Overview
 LibCSS is a CSS parser and selection engine. It aims to parse the forward
 compatible CSS grammar.
 
-Requirements
-------------
+Building
+--------
 
-LibCSS requires the following tools:
-
-* A C99 capable C compiler
-* GNU make or compatible
-* Pkg-config
-* Perl (for the testcases)
-* Python3 (minimum 3.6, for generated selection code)
-
-LibCSS also requires the following libraries to be installed:
-
-* LibParserUtils
-* LibWapcaplet
-
-Compilation
------------
-
-If necessary, modify the toolchain settings in the Makefile.
-Invoke make:
-
-    make
-
-Regenerating generated selection source code
---------------------------------------------
-
-To regenerate the selection sources (computed style data accesses),
-note this requires python3:
-
-    make select_generator
-
-Verification
-------------
-
-To verify that the parser is working, it is necessary to specify a
-different makefile target than that used for normal compilation, thus:
-
-    make test
+LibCSS is vendored into Besra and built as part of the top-level CMake
+build (see CLAUDE.md at the repo root); it is not built or installed
+standalone. The generated selection source code (computed style data
+accesses) is still generated at build time, now via a CMake custom command
+rather than a `make select_generator` step.
 
 API documentation
 -----------------

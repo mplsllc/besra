@@ -43,42 +43,12 @@ The style attribute is supported.
 Building libsvgtiny
 -------------------
 
-The library uses the Netsurf core buildsystem which must be available
-(usually at the same level as the libsvg source)
-
-The PREFIX variable can be used to perform builds which do not install
-to global system paths.
-
-You will require the following tools:
-
- - a C compiler (some parts of C99 support are required)
- - gperf
-
-following additional libraries are required:
-
- - libwapcaplet
- - libdom
-
-To compile libsvgtiny, use the command
-
-  make
-
-To install libsvgtiny into /usr/local, use
-
-  make install
-
-The VARIANT variable allows builds for "release" (the default) and "debug"
-e.g.
-
-  make VARIANT=debug
-
+libsvgtiny is vendored into Besra and built as part of the top-level CMake
+build (see CLAUDE.md at the repo root) alongside libwapcaplet and libdom,
+which it depends on; it is not built or installed standalone.
 
 Testing libsvgtiny
 ------------------
-
-The core buildsystem provides a test target which performs basic checks
-
-  make test
 
 For manual testing a svgtiny_display script is available which renders
 an svg to a bitmap. This script uses the svgtiny_test program to
