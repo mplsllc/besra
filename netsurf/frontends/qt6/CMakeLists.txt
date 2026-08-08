@@ -4,7 +4,7 @@ set(CMAKE_AUTOMOC ON)
 
 qt_add_resources(BESRA_QT6_QRC_SOURCES res/besra.qrc)
 
-add_executable(netsurf-qt6
+add_executable(besra
     main.cpp
     stubs.cpp
     schedule.cpp
@@ -23,7 +23,7 @@ add_executable(netsurf-qt6
     ${BESRA_QT6_QRC_SOURCES}
 )
 
-target_link_libraries(netsurf-qt6 PRIVATE
+target_link_libraries(besra PRIVATE
     Qt6::Core
     Qt6::Gui
     Qt6::Widgets
@@ -32,9 +32,9 @@ target_link_libraries(netsurf-qt6 PRIVATE
 )
 
 if(WIN32)
-    target_link_libraries(netsurf-qt6 PRIVATE ws2_32)
+    target_link_libraries(besra PRIVATE ws2_32)
 endif()
 
-target_include_directories(netsurf-qt6 PRIVATE
+target_include_directories(besra PRIVATE
     ${CMAKE_SOURCE_DIR}/netsurf
 )

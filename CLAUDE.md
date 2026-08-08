@@ -18,14 +18,13 @@ Root-sibling monorepo (hard fork, not submodules; each lib was imported as plain
 source at a pinned upstream SHA and now diverges independently):
 
 - `netsurf/`: the browser itself. `content/`, `desktop/`, `include/netsurf/`,
-  `utils/`, `frontends/` (currently `gtk3` is the transitional reference frontend,
-  `qt6` is the real target, being brought to parity).
+  `utils/`, `frontends/qt6/` (the only frontend; gtk3 served as the transitional
+  reference build during the port and has been deleted).
 - `libcss/`, `libdom/`, `libhubbub/`, `libparserutils/`, `libwapcaplet/`: the engine
   core (CSS parse/cascade, DOM, HTML5 parse, string interning), the actual asset.
   Being vendored in as real flattened source (in progress, see plan.md Step 5).
 - `libnsgif/`, `libnsbmp/`, `libnsutils/`, `libnspsl/`, `libsvgtiny/`, `libutf8proc/`,
   `libnslog/`: supporting libs, also being vendored in.
-- `libnsfb/`: orphaned by the frontend cull (was framebuffer-only), slated for removal.
 - `nsgenbind/`: WebIDL binding generator (build-time host tool, generates the JS/DOM
   glue consumed by `netsurf/content/handlers/javascript/duktape/`).
 - `buildsystem/`: legacy NetSurf shared-Makefile system, superseded by the top-level
@@ -43,21 +42,22 @@ CMake, orchestrated from the repo root:
 
 ```sh
 mkdir build && cd build
-cmake -DBESRA_FRONTEND=qt6 -DCMAKE_BUILD_TYPE=Debug ..
+cmake -DCMAKE_BUILD_TYPE=Debug ..
 cmake --build . -j$(nproc)
-# binary: build/netsurf/frontends/qt6/netsurf-qt6
+# binary: build/netsurf/frontends/qt6/besra
 ```
 
-- `-DBESRA_FRONTEND=gtk3|qt6` selects the frontend. Default is currently `gtk3`, the
-  transitional reference build; **qt6 is the active development target**, so always
-  pass it explicitly.
 - `-DBESRA_BUILD_TESTS=ON` enables libcss/libdom check-based tests.
 - Each vendored lib has its own `CMakeLists.txt` with an **explicit, hardcoded source
   list** (no globbing) for reproducible builds. When adding a source file to a
   vendored lib, add it to that lib's `CMakeLists.txt` (or the matching `*_srcs.txt`)
-  by hand.
-- Headless verify loop: `xvfb-run -a -s "-screen 0 1024x768x24" ./netsurf-qt6
-  file:///path/to.html`. Render output and paint events show up on stdout.
+  by hand. The qt6 frontend follows the same convention: add new `.cpp` files to
+  `netsurf/frontends/qt6/CMakeLists.txt` by hand.
+- Headless verify loop: `xvfb-run -a -s "-screen 0 1024x768x24" ./besra
+  [file:///path/to.html]` (defaults to `resource:welcome.html` with no argument).
+  Combine with `xdotool` for driving menus/dialogs in a screenshot-based check
+  (`import -window root out.png` via ImageMagick); this is how every UI milestone
+  in this project has actually been verified, not just compiled.
 
 **Known build gotcha:** a stale `-fsanitize=address` C flag can end up cached in
 `build/CMakeCache.txt` from earlier debugging and makes `nsgenbind` (a build-time
@@ -79,8 +79,7 @@ was collapsed to **direct link-time calls**:
 
 - Core code calls `gui_<area>_<op>(...)` directly (e.g. `gui_window_invalidate(...)`,
   `gui_bitmap_create(...)`, `gui_layout_width(...)`).
-- The active frontend (`frontends/qt6/` or `frontends/gtk3/`) **defines** those
-  symbols. No struct, no registration, no `guit`.
+- `frontends/qt6/` **defines** those symbols. No struct, no registration, no `guit`.
 - Where the frontend doesn't implement an operation, the default implementation lives
   in `netsurf/desktop/gui_default.c` (not scattered `#ifdef`s).
 - `desktop/gui_factory.c`, `desktop/gui_table.h`, `struct netsurf_table`, `guit`, and
@@ -89,6 +88,32 @@ was collapsed to **direct link-time calls**:
 When adding a new frontend-provided operation: declare it as a plain function in the
 relevant `include/netsurf/*.h` header, define it in the frontend, and add a default in
 `gui_default.c` only if the frontend might not provide it.
+
+## The qt6 frontend
+
+Real, functional UI, not a stub. Roughly one file per concern:
+
+- `mainwindow.h/.cpp`: `BesraWindow` (QMainWindow), menu bar, navigation toolbar
+  (back/forward/reload-stop/URL bar), tab strip, status bar. Owns tab/window routing
+  (`createTabOrWindow`, the actual `gui_window_create` logic per `GW_CREATE_TAB` etc).
+- `browsertab.h/.cpp`: `BrowserTab` (a `QScrollArea`) is the per-tab page container;
+  `NSWidget` inside it is the plotter render surface with real mouse/keyboard/wheel
+  input, forwarded into `browser_window_mouse_click/track`/`browser_window_key_press`.
+- `window.cpp`: the thin `gui_window_*` contract on top of `BrowserTab`.
+- `corewindow.h/.cpp`: `CoreWindowWidget`, a generic implementation of NetSurf's
+  `core_window` contract (the canvas the core's treeview UI, history, bookmarks,
+  cookies, page-info, draws through, reusing the same plotter table as page
+  rendering). `panels.cpp` wires history/bookmarks/cookies to it.
+- `preferences.cpp`, `downloads.cpp`, `dialogs.cpp`: preferences (nsoption-backed),
+  the download manager (`gui_download_*`), and the smaller dialogs (about, print,
+  find-in-page, view-source).
+- `resources.cpp`/`res/besra.qrc`: default.css/internal.css/icons/message-catalogue
+  etc, embedded into the binary via Qt's resource system, no filesystem path
+  discovery needed on any platform.
+
+If a `gui_*` symbol is genuinely still unimplemented, it lives in `stubs.cpp` with a
+comment saying which milestone owns it; that file should trend toward empty, not
+grow.
 
 ## Conventions and hard rules
 

@@ -15,6 +15,8 @@
 #include <QUrl>
 #include <QMimeData>
 
+#include "dialogs.h"
+
 extern "C" {
 #include "netsurf/netsurf.h"
 #include "utils/errors.h"
@@ -32,8 +34,9 @@ extern "C" {
 #include "desktop/searchweb.h"
 }
 
-/* Find-in-page forward/back button state: wired once the find dialog
- * (BesraWindow::onFindInPage) exists. */
+/* Find-in-page forward/back button state: the find dialog (dialogs.cpp's
+ * showFindInPage) doesn't currently reflect these into its own buttons;
+ * cosmetic, not a functional gap (search itself works). */
 extern "C" void gui_search_forward_state(bool active, void *p) {
     (void)active;
     (void)p;
@@ -70,9 +73,9 @@ extern "C" nserror gui_misc_launch_url(struct nsurl *url) {
         ? NSERROR_OK : NSERROR_NO_FETCH_HANDLER;
 }
 
-/* Cookie manager: wired in the corewindow/history/hotlist/cookies milestone. */
 extern "C" nserror gui_misc_present_cookies(const char *search_term) {
     (void)search_term;
+    besra::showCookies(nullptr);
     return NSERROR_OK;
 }
 
