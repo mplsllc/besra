@@ -126,8 +126,9 @@ int main(int argc, char *argv[])
     // Call a core entry point to force the linker to resolve all core dependencies.
     netsurf_init(NULL);
 
+    const char *start_page = (argc > 1) ? argv[1] : "resource:welcome.html";
     nsurl *url;
-    if (nsurl_create("file:///home/patrick/Webs/Besra/test.html", &url) == NSERROR_OK) {
+    if (nsurl_create(start_page, &url) == NSERROR_OK) {
         browser_window_create(BW_CREATE_HISTORY, url, NULL, NULL, NULL);
         nsurl_unref(url);
     }
