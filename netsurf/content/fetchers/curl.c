@@ -28,10 +28,7 @@
  */
 
 /* must come first to ensure winsock2.h vs windows.h ordering issues */
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/select.h>
+#include "utils/inet.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -1810,7 +1807,7 @@ static int fetch_curl_socket_close(void *clientp, curl_socket_t item)
 {
 	(void) clientp;
 
-	return close((int) item);
+	return ns_close_socket(item);
 }
 
 /**

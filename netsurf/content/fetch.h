@@ -27,10 +27,7 @@
 
 #include "utils/config.h"
 #include "utils/nsurl.h"
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/select.h>
+#include "utils/inet.h"
 #include "utils/http/response-codes.h"
 
 #include "netsurf/ssl_certs.h"

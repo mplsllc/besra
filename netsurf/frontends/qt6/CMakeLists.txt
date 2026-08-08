@@ -17,6 +17,10 @@ target_link_libraries(netsurf-qt6 PRIVATE
     netsurf
 )
 
+if(WIN32)
+    target_link_libraries(netsurf-qt6 PRIVATE ws2_32)
+endif()
+
 target_include_directories(netsurf-qt6 PRIVATE
     ${CMAKE_SOURCE_DIR}/netsurf
 )

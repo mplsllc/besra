@@ -1,5 +1,7 @@
 #include <QApplication>
 #include <QSocketNotifier>
+#include <QTimer>
+#include <QObject>
 #include <map>
 #include <memory>
 #include <iostream>
@@ -24,32 +26,33 @@ static nserror set_defaults(struct nsoption_s *defaults)
     return NSERROR_OK;
 }
 
-int main(int argc, char *argv[])
-{
-    QApplication app(argc, argv);
-    
-    nsoption_init(set_defaults, &nsoptions, &nsoptions_default);
-    
-    // Set bitmap format to match Qt's Format_ARGB32_Premultiplied
-    bitmap_fmt_t fmt = {
-        .layout = BITMAP_LAYOUT_ARGB8888,
-        .pma = true,
-    };
-    bitmap_set_format(&fmt);
-    
-    // Call a core entry point to force the linker to resolve all core dependencies.
-    netsurf_init(NULL);
-    
-    nsurl *url;
-    if (nsurl_create("file:///home/patrick/Webs/Besra/test.html", &url) == NSERROR_OK) {
-        browser_window_create(BW_CREATE_HISTORY, url, NULL, NULL, NULL);
-        nsurl_unref(url);
-    }
-    
-    std::map<int, std::unique_ptr<QSocketNotifier>> read_notifiers;
-    std::map<int, std::unique_ptr<QSocketNotifier>> write_notifiers;
+namespace {
 
-    while (true) {
+/**
+ * Drives NetSurf's fetch layer from Qt's event loop.
+ *
+ * fetch_fdset() both services any fetcher that is ready (it calls
+ * curl_multi_perform() internally) and reports the socket set the fetch
+ * layer next wants woken up for. We mirror that set onto QSocketNotifier
+ * objects, whose only job is to call back in here so the fdset gets
+ * re-polled and re-serviced. A periodic heartbeat timer covers fetch
+ * timeouts that have nothing to do with socket readiness (DNS, connect,
+ * stalled transfers): libcurl needs fetch_fdset()/curl_multi_perform()
+ * called periodically regardless of I/O activity to notice those.
+ */
+class FetchPump : public QObject {
+public:
+    explicit FetchPump(QObject *parent = nullptr) : QObject(parent)
+    {
+        heartbeat_.setInterval(200);
+        connect(&heartbeat_, &QTimer::timeout, this, &FetchPump::pump);
+        heartbeat_.start();
+        pump();
+    }
+
+private:
+    void pump()
+    {
         fd_set read_fd_set, write_fd_set, exc_fd_set;
         int max_fd = -1;
         FD_ZERO(&read_fd_set);
@@ -58,44 +61,74 @@ int main(int argc, char *argv[])
         fetch_fdset(&read_fd_set, &write_fd_set, &exc_fd_set, &max_fd);
 
         for (int i = 0; i <= max_fd; i++) {
-            if (FD_ISSET(i, &read_fd_set)) {
-                if (read_notifiers.find(i) == read_notifiers.end()) {
-                    auto sn = std::make_unique<QSocketNotifier>(i, QSocketNotifier::Read);
-                    QObject::connect(sn.get(), &QSocketNotifier::activated, []() {});
-                    read_notifiers[i] = std::move(sn);
-                } else {
-                    read_notifiers[i]->setEnabled(true);
-                }
-            } else if (read_notifiers.find(i) != read_notifiers.end()) {
-                read_notifiers[i]->setEnabled(false);
-            }
-
-            if (FD_ISSET(i, &write_fd_set)) {
-                if (write_notifiers.find(i) == write_notifiers.end()) {
-                    auto sn = std::make_unique<QSocketNotifier>(i, QSocketNotifier::Write);
-                    QObject::connect(sn.get(), &QSocketNotifier::activated, []() {});
-                    write_notifiers[i] = std::move(sn);
-                } else {
-                    write_notifiers[i]->setEnabled(true);
-                }
-            } else if (write_notifiers.find(i) != write_notifiers.end()) {
-                write_notifiers[i]->setEnabled(false);
-            }
+            update_notifier(read_notifiers_, i, FD_ISSET(i, &read_fd_set),
+                             QSocketNotifier::Read);
+            update_notifier(write_notifiers_, i, FD_ISSET(i, &write_fd_set),
+                             QSocketNotifier::Write);
         }
 
-        // Clean up notifiers for FDs larger than max_fd
-        for (auto it = read_notifiers.begin(); it != read_notifiers.end(); ) {
-            if (it->first > max_fd) it = read_notifiers.erase(it);
-            else ++it;
-        }
-        for (auto it = write_notifiers.begin(); it != write_notifiers.end(); ) {
-            if (it->first > max_fd) it = write_notifiers.erase(it);
-            else ++it;
-        }
+        prune_notifiers(read_notifiers_, max_fd);
+        prune_notifiers(write_notifiers_, max_fd);
 
-        app.processEvents(QEventLoop::WaitForMoreEvents);
         schedule_run();
     }
-    
-    return 0;
+
+    using NotifierMap = std::map<int, std::unique_ptr<QSocketNotifier>>;
+
+    void update_notifier(NotifierMap &notifiers, int fd, bool wanted,
+                          QSocketNotifier::Type type)
+    {
+        auto it = notifiers.find(fd);
+        if (wanted) {
+            if (it == notifiers.end()) {
+                auto sn = std::make_unique<QSocketNotifier>(fd, type);
+                connect(sn.get(), &QSocketNotifier::activated, this, &FetchPump::pump);
+                notifiers[fd] = std::move(sn);
+            } else {
+                it->second->setEnabled(true);
+            }
+        } else if (it != notifiers.end()) {
+            it->second->setEnabled(false);
+        }
+    }
+
+    static void prune_notifiers(NotifierMap &notifiers, int max_fd)
+    {
+        for (auto it = notifiers.begin(); it != notifiers.end(); ) {
+            it = (it->first > max_fd) ? notifiers.erase(it) : std::next(it);
+        }
+    }
+
+    QTimer heartbeat_;
+    NotifierMap read_notifiers_;
+    NotifierMap write_notifiers_;
+};
+
+} // namespace
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+
+    nsoption_init(set_defaults, &nsoptions, &nsoptions_default);
+
+    // Set bitmap format to match Qt's Format_ARGB32_Premultiplied
+    bitmap_fmt_t fmt = {
+        .layout = BITMAP_LAYOUT_ARGB8888,
+        .pma = true,
+    };
+    bitmap_set_format(&fmt);
+
+    // Call a core entry point to force the linker to resolve all core dependencies.
+    netsurf_init(NULL);
+
+    nsurl *url;
+    if (nsurl_create("file:///home/patrick/Webs/Besra/test.html", &url) == NSERROR_OK) {
+        browser_window_create(BW_CREATE_HISTORY, url, NULL, NULL, NULL);
+        nsurl_unref(url);
+    }
+
+    FetchPump pump;
+
+    return app.exec();
 }

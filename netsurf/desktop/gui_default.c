@@ -35,13 +35,8 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "utils/errors.h"
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/select.h>
 #include "netsurf/utf8.h"
 #include "netsurf/search.h"
 #include "netsurf/fetch.h"
