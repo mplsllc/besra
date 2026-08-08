@@ -71,24 +71,6 @@ extern "C" void gui_window_file_gadget_open(struct gui_window *gw, struct hlcach
     
 }
 
-extern "C" const char *gui_fetch_filetype(const char *unix_path) {
-    if (strstr(unix_path, ".css")) return "text/css";
-    if (strstr(unix_path, ".png")) return "image/png";
-    return "text/html";
-}
-
-extern "C" struct nsurl * gui_fetch_get_resource_url(const char *path) {
-    struct nsurl *url = NULL;
-    char buf[1024];
-    snprintf(buf, sizeof(buf), "file:///home/patrick/Webs/Besra/netsurf/frontends/gtk/res/%s", path);
-    nsurl_create(buf, &url);
-    return url;
-}
-
-extern "C" nserror gui_fetch_get_resource_data(const char *path, const uint8_t **data, size_t *data_len) {
-    return NSERROR_NOT_FOUND;
-}
-
 extern "C" void gui_clipboard_get(char **buffer, size_t *length) {
     
 }

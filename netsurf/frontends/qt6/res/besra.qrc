@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/res">
+        <file>adblock.css</file>
+        <file>credits.html</file>
+        <file>default.css</file>
+        <file>default.ico</file>
+        <file>favicon.png</file>
+        <file>internal.css</file>
+        <file>licence.html</file>
+        <file>Messages</file>
+        <file>netsurf.png</file>
+        <file>quirks.css</file>
+        <file>welcome.html</file>
+        <file>icons/content.png</file>
+        <file>icons/directory.png</file>
+        <file>icons/search.png</file>
+    </qresource>
+</RCC>

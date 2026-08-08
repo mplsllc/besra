@@ -16,6 +16,8 @@ extern "C" {
 void schedule_run(void);
 }
 
+#include "resources.h"
+
 static nserror set_defaults(struct nsoption_s *defaults)
 {
     nsoption_set_charp(font_sans, strdup("Sans"));
@@ -109,6 +111,8 @@ private:
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
+    besra::load_messages();
 
     nsoption_init(set_defaults, &nsoptions, &nsoptions_default);
 

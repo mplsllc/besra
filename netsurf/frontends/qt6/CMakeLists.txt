@@ -1,5 +1,7 @@
 find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
 
+qt_add_resources(BESRA_QT6_QRC_SOURCES res/besra.qrc)
+
 add_executable(netsurf-qt6
     main.cpp
     stubs.cpp
@@ -8,6 +10,8 @@ add_executable(netsurf-qt6
     plotters.cpp
     window.cpp
     bitmap.cpp
+    resources.cpp
+    ${BESRA_QT6_QRC_SOURCES}
 )
 
 target_link_libraries(netsurf-qt6 PRIVATE
