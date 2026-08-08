@@ -131,21 +131,9 @@ void showPrint(QWidget *parent, struct browser_window *bw)
 }
 
 /* showHistory/showBookmarks/showCookies/addBookmark: implemented in
- * panels.cpp (they share the CoreWindowWidget machinery). */
+ * panels.cpp (they share the CoreWindowWidget machinery).
+ * showPreferences: implemented in preferences.cpp. */
 
-/* The remaining panels need their own milestones (preferences: an
- * nsoption-backed settings dialog; downloads: the gui_download_* wiring). */
-
-void showPreferences(QWidget *parent)
-{
-    QMessageBox::information(parent, QObject::tr("Preferences"),
-        QObject::tr("The preferences dialog is being built next."));
-}
-
-void showDownloads(QWidget *parent)
-{
-    QMessageBox::information(parent, QObject::tr("Downloads"),
-        QObject::tr("The download manager is being built next."));
-}
+/* showDownloads: implemented in downloads.cpp. */
 
 } // namespace besra

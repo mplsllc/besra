@@ -63,28 +63,7 @@ extern "C" void gui_clipboard_set(const char *buffer, size_t length,
     QApplication::clipboard()->setText(QString::fromUtf8(buffer, static_cast<int>(length)));
 }
 
-/* Download manager: wired in the downloads milestone. */
-extern "C" struct gui_download_window * gui_download_create(struct download_context *ctx, struct gui_window *parent) {
-    (void)ctx;
-    (void)parent;
-    return NULL;
-}
-
-extern "C" nserror gui_download_data(struct gui_download_window *dw, const char *data, unsigned int size) {
-    (void)dw;
-    (void)data;
-    (void)size;
-    return NSERROR_OK;
-}
-
-extern "C" void gui_download_error(struct gui_download_window *dw, const char *error_msg) {
-    (void)dw;
-    (void)error_msg;
-}
-
-extern "C" void gui_download_done(struct gui_download_window *dw) {
-    (void)dw;
-}
+/* Download manager: implemented in downloads.cpp. */
 
 extern "C" nserror gui_misc_launch_url(struct nsurl *url) {
     return QDesktopServices::openUrl(QUrl(QString::fromUtf8(nsurl_access(url))))

@@ -18,6 +18,8 @@ add_executable(netsurf-qt6
     dialogs.cpp
     corewindow.cpp
     panels.cpp
+    preferences.cpp
+    downloads.cpp
     ${BESRA_QT6_QRC_SOURCES}
 )
 
