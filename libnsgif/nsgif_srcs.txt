@@ -1,0 +1,2 @@
+    src/gif.c
+    src/lzw.c

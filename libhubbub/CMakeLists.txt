@@ -1,0 +1,5 @@
+add_library(hubbub STATIC "")
+file(GLOB_RECURSE SRC "src/*.c")
+target_sources(hubbub PRIVATE ${SRC})
+target_include_directories(hubbub PUBLIC include PRIVATE src)
+target_link_libraries(hubbub PUBLIC parserutils)

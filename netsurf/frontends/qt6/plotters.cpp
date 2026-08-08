@@ -6,6 +6,7 @@
 #include <QBrush>
 #include <QPainterPath>
 #include <QString>
+#include <iostream>
 
 #include "qt_font.h"
 
@@ -17,6 +18,7 @@ extern "C" {
 }
 
 QPainter *qt_current_painter = nullptr;
+QImage *gui_bitmap_get_qimage(struct bitmap *vbitmap);
 
 static QColor qt_color(colour c) {
     return QColor(c & 0xff, (c >> 8) & 0xff, (c >> 16) & 0xff, 255);
@@ -103,6 +105,7 @@ static nserror qt_line(const struct redraw_context *ctx, const plot_style_t *pst
 
 static nserror qt_rectangle(const struct redraw_context *ctx, const plot_style_t *pstyle, const struct rect *rect) {
     if (!qt_current_painter) return NSERROR_OK;
+    std::cout << "plot_rectangle called" << std::endl;
     QPen pen;
     QBrush brush;
     apply_style(pstyle, pen, brush);
@@ -176,8 +179,8 @@ static nserror qt_path(const struct redraw_context *ctx, const plot_style_t *pst
 static nserror qt_bitmap(const struct redraw_context *ctx, struct bitmap *bitmap, int x, int y, int width, int height, colour bg, bitmap_flags_t flags) {
     if (!qt_current_painter || !bitmap) return NSERROR_OK;
     
-    // We cast struct bitmap to QImage*. This requires our bitmap.cpp implementation to return QImage* from create.
-    QImage *img = (QImage *)bitmap;
+    QImage *img = gui_bitmap_get_qimage(bitmap);
+    if (!img) return NSERROR_OK;
     
     qt_current_painter->save();
     

@@ -2,13 +2,32 @@
 #define QT_FONT_H
 
 #include <QFont>
+#include <QString>
 
 extern "C" {
 #include "netsurf/plot_style.h"
+#include "utils/nsoption.h"
+}
+
+static inline QString qt_font_family(const plot_font_style_t *fstyle) {
+    switch (fstyle->family) {
+    case PLOT_FONT_FAMILY_SERIF:
+        return QString::fromUtf8(nsoption_charp(font_serif));
+    case PLOT_FONT_FAMILY_MONOSPACE:
+        return QString::fromUtf8(nsoption_charp(font_mono));
+    case PLOT_FONT_FAMILY_CURSIVE:
+        return QString::fromUtf8(nsoption_charp(font_cursive));
+    case PLOT_FONT_FAMILY_FANTASY:
+        return QString::fromUtf8(nsoption_charp(font_fantasy));
+    case PLOT_FONT_FAMILY_SANS_SERIF:
+    default:
+        return QString::fromUtf8(nsoption_charp(font_sans));
+    }
 }
 
 static inline QFont qt_font(const plot_font_style_t *fstyle) {
     QFont font;
+    font.setFamily(qt_font_family(fstyle));
     switch (fstyle->family) {
     case PLOT_FONT_FAMILY_SERIF:
         font.setStyleHint(QFont::Serif);

@@ -64,25 +64,7 @@ struct nsoption_s *nsoptions_default = NULL;
 static struct nsoption_s defaults[] = {
 #include "desktop/options.h"
 
-#if defined(riscos)
-#include "riscos/options.h"
-#elif defined(nsgtk)
-#include "gtk/options.h"
-#elif defined(nsbeos)
-#include "beos/options.h"
-#elif defined(nsamiga)
-#include "amiga/options.h"
-#elif defined(nsframebuffer)
-#include "framebuffer/options.h"
-#elif defined(nsatari)
-#include "atari/options.h"
-#elif defined(nsmonkey)
-#include "monkey/options.h"
-#elif defined(nswin32)
-#include "windows/options.h"
-#elif defined(nsqt)
-#include "qt/options.h"
-#endif
+
 	{ NULL, 0, OPTION_INTEGER, { 0 } }
 };
 

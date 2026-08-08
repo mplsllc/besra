@@ -59,6 +59,11 @@ extern "C" size_t gui_bitmap_get_rowstride(void *vbitmap) {
     return gbitmap->image->bytesPerLine();
 }
 
+QImage *gui_bitmap_get_qimage(struct bitmap *vbitmap) {
+    if (!vbitmap) return nullptr;
+    return vbitmap->image;
+}
+
 extern "C" int gui_bitmap_get_width(void *vbitmap) {
     if (!vbitmap) return 0;
     struct bitmap *gbitmap = (struct bitmap *)vbitmap;

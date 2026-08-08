@@ -2,6 +2,7 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include <QApplication>
+#include <QImage>
 #include <iostream>
 
 extern "C" {
@@ -54,7 +55,10 @@ protected:
         extern int get_scroll_x(struct gui_window *gw);
         extern int get_scroll_y(struct gui_window *gw);
         
-        browser_window_redraw(gw->bw, -get_scroll_x(gw), -get_scroll_y(gw), &clip, &ctx);
+        std::cout << "paintEvent firing, calling browser_window_redraw..." << std::endl;
+        bool res = browser_window_redraw(gw->bw, -get_scroll_x(gw), -get_scroll_y(gw), &clip, &ctx);
+        std::cout << "browser_window_redraw returned: " << res << std::endl;
+
         
         qt_current_painter = nullptr;
     }
@@ -85,7 +89,12 @@ extern "C" void gui_window_destroy(struct gui_window *gw) {
 }
 
 extern "C" nserror gui_window_invalidate(struct gui_window *gw, const struct rect *rect) {
-    gw->widget->update(QRect(rect->x0, rect->y0, rect->x1 - rect->x0, rect->y1 - rect->y0));
+    std::cout << "gui_window_invalidate called" << std::endl;
+    if (rect == NULL) {
+        gw->widget->update();
+    } else {
+        gw->widget->update(QRect(rect->x0, rect->y0, rect->x1 - rect->x0, rect->y1 - rect->y0));
+    }
     return NSERROR_OK;
 }
 
@@ -105,5 +114,6 @@ extern "C" nserror gui_window_set_scroll(struct gui_window *gw, const struct rec
 extern "C" nserror gui_window_get_dimensions(struct gui_window *gw, int *width, int *height) {
     if (width) *width = gw->widget->width();
     if (height) *height = gw->widget->height();
+    std::cout << "gui_window_get_dimensions: " << (width ? *width : -1) << "x" << (height ? *height : -1) << std::endl;
     return NSERROR_OK;
 }

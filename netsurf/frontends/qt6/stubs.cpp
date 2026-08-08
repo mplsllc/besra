@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
 extern "C" {
@@ -70,14 +71,16 @@ extern "C" void gui_window_file_gadget_open(struct gui_window *gw, struct hlcach
     
 }
 
-extern "C" const char * gui_fetch_filetype(const char *unix_path) {
+extern "C" const char *gui_fetch_filetype(const char *unix_path) {
+    if (strstr(unix_path, ".css")) return "text/css";
+    if (strstr(unix_path, ".png")) return "image/png";
     return "text/html";
 }
 
 extern "C" struct nsurl * gui_fetch_get_resource_url(const char *path) {
     struct nsurl *url = NULL;
     char buf[1024];
-    snprintf(buf, sizeof(buf), "file:///tmp/%s", path);
+    snprintf(buf, sizeof(buf), "file:///home/patrick/Webs/Besra/netsurf/frontends/gtk/res/%s", path);
     nsurl_create(buf, &url);
     return url;
 }

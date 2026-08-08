@@ -1101,6 +1101,9 @@ static void nsgtk_main(void)
 			g_main_context_remove_poll(0, fd_list[i]);
 			free(fd_list[i]);
 		}
+		
+		extern void schedule_run(void);
+		schedule_run();
 	}
 }
 

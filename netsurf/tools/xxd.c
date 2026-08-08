@@ -131,5 +131,9 @@ int main(int argc, char **argv)
 	fclose(outf);
 	fclose(inf);
 	
+	if (aryname != NULL) {
+		free(aryname);
+	}
+	
 	return 0;
 }

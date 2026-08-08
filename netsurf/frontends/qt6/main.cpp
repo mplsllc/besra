@@ -61,19 +61,25 @@ int main(int argc, char *argv[])
             if (FD_ISSET(i, &read_fd_set)) {
                 if (read_notifiers.find(i) == read_notifiers.end()) {
                     auto sn = std::make_unique<QSocketNotifier>(i, QSocketNotifier::Read);
+                    QObject::connect(sn.get(), &QSocketNotifier::activated, []() {});
                     read_notifiers[i] = std::move(sn);
+                } else {
+                    read_notifiers[i]->setEnabled(true);
                 }
-            } else {
-                read_notifiers.erase(i);
+            } else if (read_notifiers.find(i) != read_notifiers.end()) {
+                read_notifiers[i]->setEnabled(false);
             }
 
             if (FD_ISSET(i, &write_fd_set)) {
                 if (write_notifiers.find(i) == write_notifiers.end()) {
                     auto sn = std::make_unique<QSocketNotifier>(i, QSocketNotifier::Write);
+                    QObject::connect(sn.get(), &QSocketNotifier::activated, []() {});
                     write_notifiers[i] = std::move(sn);
+                } else {
+                    write_notifiers[i]->setEnabled(true);
                 }
-            } else {
-                write_notifiers.erase(i);
+            } else if (write_notifiers.find(i) != write_notifiers.end()) {
+                write_notifiers[i]->setEnabled(false);
             }
         }
 

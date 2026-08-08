@@ -297,3 +297,44 @@ NSOPTION_COLOUR(sys_colour_VisitedText, 0x008b1a55)
 NSOPTION_STRING(log_filter, NETSURF_BUILTIN_LOG_FILTER)
 /** Filter for verbose logging */
 NSOPTION_STRING(verbose_filter, NETSURF_BUILTIN_VERBOSE_FILTER)
+/* clear downloads */
+NSOPTION_BOOL(downloads_clear, false)
+
+/* prompt before overwriting downloads */
+NSOPTION_BOOL(request_overwrite, true)
+
+/* location to download files to */
+NSOPTION_STRING(downloads_directory, NULL)
+
+/* where to store URL database */
+NSOPTION_STRING(url_file, NULL)
+
+/* Always show tabs even if there is only one */
+NSOPTION_BOOL(show_single_tab, false)
+
+/* size of buttons */
+NSOPTION_INTEGER(button_type, 0)
+
+/* number of days to keep history data */
+NSOPTION_INTEGER(history_age, 0)
+
+/* show urls in local history browser */
+NSOPTION_BOOL(hover_urls, false)
+
+/* new tabs are blank instead of homepage */
+NSOPTION_BOOL(new_blank, false)
+
+/* path to save hotlist file */
+NSOPTION_STRING(hotlist_path, NULL)
+
+/* Developer information viewer display method */
+NSOPTION_INTEGER(developer_view, 0)
+
+/* where tabs are positioned */
+NSOPTION_INTEGER(position_tab, 0)
+
+/* Toolbar customisation */
+NSOPTION_STRING(toolbar_items, NULL)
+
+/* The menu and tool bars that are shown */
+NSOPTION_STRING(bar_show, NULL)

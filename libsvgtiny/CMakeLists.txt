@@ -1,0 +1,5 @@
+add_library(svgtiny STATIC "")
+file(GLOB_RECURSE SRC "src/*.c")
+target_sources(svgtiny PRIVATE ${SRC})
+target_include_directories(svgtiny PUBLIC include PRIVATE src)
+target_link_libraries(svgtiny PUBLIC dom wapcaplet)
