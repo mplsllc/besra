@@ -17,16 +17,26 @@ vision/strategy and roadmap, and `CLAUDE.md` for architecture and build notes.
   Linux-native forms.
 * **Step 6 (started early, ahead of Step 5):** Qt6 frontend stood up against the
   direct-call core: plotters (QPainter), window (QWidget), bitmap (QImage), layout/
-  font metrics (QFontMetrics + QTextLayout for exact shaping), scheduler (batching
-  queue), fetcher fd polling (QSocketNotifier). `netsurf-qt6` builds, links, and
-  **renders real HTML correctly** (headings, wrapped text, table layout), verified via
-  `xvfb-run` + screenshot. `BESRA_FRONTEND` CMake option selects `gtk3` or `qt6`.
+  font metrics (QFontMetrics + QTextLayout for exact shaping), scheduler (QTimer-based,
+  portable). `netsurf-qt6` builds, links, and **renders real HTML correctly** (headings,
+  wrapped text, table layout), verified via `xvfb-run` + screenshot. `BESRA_FRONTEND`
+  CMake option selects `gtk3` or `qt6`.
+* **Step 4b:** The Step 4 shim collapse had gone further than intended (deleted the
+  `gui_fetch_socket_open/close` frontend hooks entirely and inlined raw POSIX
+  `socket()`/`close()` into `curl.c`; `close()` on a Windows `SOCKET` is actually wrong).
+  Added `utils/inet.h` as the one place raw platform socket headers are included from
+  (winsock2.h on Windows, POSIX headers elsewhere) with `ns_close_socket` as the
+  portable close primitive; `content/fetch.h` and `curl.c` route through it now. Also
+  fixed two real bugs in the qt6 frontend's fetch integration found along the way: the
+  `QSocketNotifier` callbacks were empty no-ops, and `main.cpp` never called
+  `QApplication::exec()` (it hand-rolled a `while(true)` + `processEvents` loop with no
+  timeout, so libcurl's own timeout handling could go unserviced). Replaced with a
+  `FetchPump` QObject: functional notifier callbacks, a 200ms heartbeat `QTimer`, and a
+  real `app.exec()`. Verified via screenshot: a real 200 render is pixel-identical to
+  the prior baseline, and a 404 (proving the fetch layer genuinely round-trips) renders
+  correctly.
 
 ## Upcoming
-* **Step 4b (deferred from Step 4):** The scheduler/fetch collapse so far targeted
-  Linux-native glibc forms to unblock the build. Per the Qt-not-glibc rule, revisit so
-  the *portable* layer (QTimer, libcurl sockets) is what Windows/Mac will actually use,
-  don't let glibc-specific shortcuts calcify into the real platform layer.
 * **Step 5:** Vendor the libraries (`libwapcaplet`, `libdom`, etc.) in as real flattened
   source, dropping the "independent projects" pretense (CMakeLists.txt per lib are already
   in place as of Step 3; this is the source-tree flattening itself).
