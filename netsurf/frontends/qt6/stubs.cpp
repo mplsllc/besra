@@ -97,50 +97,6 @@ extern "C" nserror gui_misc_present_cookies(const char *search_term) {
     return NSERROR_OK;
 }
 
-/* core_window (the generic list-canvas the core draws history/hotlist/
- * cookies/page-info through): wired in the corewindow milestone. */
-extern "C" nserror gui_corewindow_invalidate(struct core_window *cw, const struct rect *rect) {
-    (void)cw;
-    (void)rect;
-    return NSERROR_OK;
-}
-
-extern "C" nserror gui_corewindow_set_extent(struct core_window *cw, int width, int height) {
-    (void)cw;
-    (void)width;
-    (void)height;
-    return NSERROR_OK;
-}
-
-extern "C" nserror gui_corewindow_set_scroll(struct core_window *cw, int x, int y) {
-    (void)cw;
-    (void)x;
-    (void)y;
-    return NSERROR_OK;
-}
-
-extern "C" nserror gui_corewindow_get_scroll(const struct core_window *cw, int *x, int *y) {
-    (void)cw;
-    if (x) *x = 0;
-    if (y) *y = 0;
-    return NSERROR_OK;
-}
-
-extern "C" nserror gui_corewindow_get_dimensions(const struct core_window *cw,
-		int *width, int *height) {
-    (void)cw;
-    if (width) *width = 0;
-    if (height) *height = 0;
-    return NSERROR_OK;
-}
-
-extern "C" nserror gui_corewindow_drag_status(struct core_window *cw,
-		core_window_drag_status ds) {
-    (void)cw;
-    (void)ds;
-    return NSERROR_OK;
-}
-
 extern "C" nserror gui_search_web_provider_update(const char *provider_name, struct bitmap *ico_bitmap) {
     (void)provider_name;
     (void)ico_bitmap;

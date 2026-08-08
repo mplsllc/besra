@@ -16,6 +16,8 @@ add_executable(netsurf-qt6
     browsertab.cpp
     mainwindow.cpp
     dialogs.cpp
+    corewindow.cpp
+    panels.cpp
     ${BESRA_QT6_QRC_SOURCES}
 )
 

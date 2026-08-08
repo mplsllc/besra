@@ -130,11 +130,11 @@ void showPrint(QWidget *parent, struct browser_window *bw)
     qt_current_painter = nullptr;
 }
 
-/* The remaining panels below need the corewindow milestone (history,
- * bookmarks, cookies all render through the core's generic treeview via a
- * core_window) or the download-manager milestone; both are the immediate
- * next work, not deferred indefinitely. Until then these say so honestly
- * rather than pretending to work. */
+/* showHistory/showBookmarks/showCookies/addBookmark: implemented in
+ * panels.cpp (they share the CoreWindowWidget machinery). */
+
+/* The remaining panels need their own milestones (preferences: an
+ * nsoption-backed settings dialog; downloads: the gui_download_* wiring). */
 
 void showPreferences(QWidget *parent)
 {
@@ -142,33 +142,10 @@ void showPreferences(QWidget *parent)
         QObject::tr("The preferences dialog is being built next."));
 }
 
-void showHistory(QWidget *parent)
-{
-    QMessageBox::information(parent, QObject::tr("History"),
-        QObject::tr("History is being wired up next (needs the core window view)."));
-}
-
-void showBookmarks(QWidget *parent)
-{
-    QMessageBox::information(parent, QObject::tr("Bookmarks"),
-        QObject::tr("Bookmarks are being wired up next (needs the core window view)."));
-}
-
-void showCookies(QWidget *parent)
-{
-    QMessageBox::information(parent, QObject::tr("Cookies"),
-        QObject::tr("Cookie management is being wired up next (needs the core window view)."));
-}
-
 void showDownloads(QWidget *parent)
 {
     QMessageBox::information(parent, QObject::tr("Downloads"),
         QObject::tr("The download manager is being built next."));
-}
-
-void addBookmark(struct browser_window *bw)
-{
-    (void)bw;
 }
 
 } // namespace besra
