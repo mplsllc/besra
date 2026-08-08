@@ -70,15 +70,31 @@ vision/strategy and roadmap, and `CLAUDE.md` for architecture and build notes.
   `src/` layout stays as-is; that's a large, high-risk, low-value mechanical rewrite
   with no concrete benefit distinct from what's already fixed here.
 
+* **Step 6 follow-ups, closed out:** the four gaps flagged when Step 6 landed are now
+  real, not just fixed-in-name:
+  - Bookmarks now persist to `<AppConfigLocation>/besra/hotlist` (via
+    `QStandardPaths::AppConfigLocation`), saved on `QApplication::aboutToQuit`.
+    Verified end-to-end: added a bookmark, quit, relaunched, the entry (and the
+    "Unsorted entries" folder it lives in) survived. Along the way, found that
+    `hotlist_add_url()` needs `hotlist_manager_init()` (a corewindow attached), not
+    just `hotlist_init()`, to succeed at all, and that it correctly declines internal
+    pseudo-pages like `resource:welcome.html` (no bookmarking `about:blank`, same as
+    any real browser) -- neither is a bug, both now documented in panels.cpp.
+  - `gui_window_set_icon` builds a `QIcon` from the content's bitmap
+    (`content_get_bitmap` + bitmap.cpp's `gui_bitmap_get_qimage`) and reflects it in
+    the tab. Verified: no crash on a real `<link rel="icon">` page, icon visible in
+    the tab strip.
+  - `gui_window_create_form_select_menu` is a real `QMenu` popup now: one checkable
+    action per `form_option`, positioned at the control's bounding rect, committing
+    via `form_select_process_selection` on click. Verified: a real `<select>` renders
+    and its popup shows all options with the correct one checked.
+  - Find-in-page's forward/back buttons now reflect `gui_search_forward/back_state`
+    via a small per-dialog registry keyed on the same context pointer
+    `browser_window_search()` is given (dialogs.cpp).
+
 ## Upcoming
 
-* **Known follow-ups from Step 6** (functional but with an honest gap, not fake):
-  - Bookmarks (hotlist) has no persistence path yet: in-memory only for the session.
-  - Favicon rendering (`gui_window_set_icon`) is a no-op.
-  - `<select>` dropdown menus (`gui_window_create_form_select_menu`) not yet wired to
-    a real QMenu popup.
-  - Find-in-page's forward/back buttons don't reflect `gui_search_forward/back_state`
-    (search itself works; only the button enabled-state feedback is missing).
+(nothing currently queued; see Future / On Radar for the next tier of work)
 
 ## Future / On Radar
 

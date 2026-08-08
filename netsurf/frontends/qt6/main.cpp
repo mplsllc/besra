@@ -17,6 +17,7 @@ void schedule_run(void);
 }
 
 #include "resources.h"
+#include "dialogs.h"
 
 static nserror set_defaults(struct nsoption_s *defaults)
 {
@@ -134,6 +135,10 @@ int main(int argc, char *argv[])
     }
 
     FetchPump pump;
+
+    QObject::connect(&app, &QApplication::aboutToQuit, [] {
+        besra::finalizeHotlist();
+    });
 
     return app.exec();
 }

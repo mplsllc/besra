@@ -13,6 +13,9 @@
 #include <QFileDialog>
 #include <QAction>
 #include <QStatusBar>
+#include <QImage>
+#include <QPixmap>
+#include <QIcon>
 
 extern "C" {
 #include "utils/errors.h"
@@ -20,9 +23,14 @@ extern "C" {
 #include "netsurf/browser_window.h"
 #include "netsurf/mouse.h"
 #include "netsurf/window.h"
+#include "netsurf/form.h"
 #include "utils/nsurl.h"
 #include "desktop/browser_history.h"
 }
+
+/* bitmap.cpp's QImage accessor for a struct bitmap*, used to build a
+ * favicon QIcon directly rather than duplicating pixel-buffer plumbing. */
+extern QImage *gui_bitmap_get_qimage(struct bitmap *vbitmap);
 
 struct gui_window {
     BrowserTab *tab;
@@ -112,9 +120,18 @@ extern "C" nserror gui_window_set_url(struct gui_window *gw, struct nsurl *url)
 
 extern "C" void gui_window_set_icon(struct gui_window *gw, struct hlcache_handle *icon)
 {
-    (void)gw;
-    (void)icon;
-    /* Favicon rendering: deferred, not required for functional parity. */
+    if (icon == nullptr) {
+        return;
+    }
+    struct bitmap *bmp = content_get_bitmap(icon);
+    if (bmp == nullptr) {
+        return;
+    }
+    QImage *image = gui_bitmap_get_qimage(bmp);
+    if (image == nullptr || image->isNull()) {
+        return;
+    }
+    gw->tab->setFavicon(QIcon(QPixmap::fromImage(*image)));
 }
 
 extern "C" void gui_window_set_status(struct gui_window *gw, const char *text)
@@ -165,10 +182,32 @@ extern "C" void gui_window_place_caret(struct gui_window *gw, int x, int y, int 
 
 extern "C" void gui_window_create_form_select_menu(struct gui_window *gw, struct form_control *control)
 {
-    (void)control;
-    /* A full <select> popup needs the option-list accessor from
-     * desktop/textarea.h / render/form.h; deferred alongside forms polish. */
-    (void)gw;
+    QWidget *surface = gw->tab->renderWidget();
+
+    QMenu menu(surface);
+    for (int i = 0; ; i++) {
+        struct form_option *option = form_select_get_option(control, i);
+        if (option == nullptr) {
+            break;
+        }
+        QAction *action = menu.addAction(QString::fromUtf8(option->text));
+        action->setCheckable(true);
+        action->setChecked(option->selected);
+        QObject::connect(action, &QAction::triggered, surface,
+            [control, i] { form_select_process_selection(control, i); });
+    }
+
+    if (menu.isEmpty()) {
+        return;
+    }
+
+    struct rect bounds;
+    QPoint popup_pos = surface->mapToGlobal(QPoint(0, 0));
+    if (form_control_bounding_rect(control, &bounds) == NSERROR_OK) {
+        popup_pos = surface->mapToGlobal(QPoint(bounds.x0 - gw->tab->scrollX(),
+            bounds.y1 - gw->tab->scrollY()));
+    }
+    menu.exec(popup_pos);
 }
 
 extern "C" void gui_window_file_gadget_open(struct gui_window *gw, struct hlcache_handle *hl,

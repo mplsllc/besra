@@ -3,6 +3,7 @@
 
 #include <QScrollArea>
 #include <QString>
+#include <QIcon>
 
 extern "C" {
 struct browser_window;
@@ -36,6 +37,7 @@ public:
     const QString &title() const { return title_; }
     const QString &url() const { return url_; }
     bool loading() const { return loading_; }
+    const QIcon &favicon() const { return favicon_; }
 
     int scrollX() const { return scroll_x_; }
     int scrollY() const { return scroll_y_; }
@@ -44,6 +46,7 @@ public:
     void setTitle(const QString &title);
     void setUrl(const QString &url);
     void setLoading(bool loading);
+    void setFavicon(const QIcon &icon);
 
     /** Re-query the core for the full content size and update scrollbars. */
     void updateContentExtent();
@@ -60,6 +63,7 @@ private:
     BesraWindow *window_;
     QString title_;
     QString url_;
+    QIcon favicon_;
     bool loading_ = false;
     int scroll_x_ = 0;
     int scroll_y_ = 0;

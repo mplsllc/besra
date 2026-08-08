@@ -12,6 +12,7 @@
 #include <QPrinter>
 #include <QPrintDialog>
 #include <QPainter>
+#include <QMap>
 
 extern "C" {
 #include "utils/errors.h"
@@ -23,6 +24,36 @@ extern "C" {
 
 extern const struct plotter_table nsqt_plotters;
 extern QPainter *qt_current_painter;
+
+namespace {
+
+/** Maps a live find-in-page dialog (the `context` browser_window_search()
+ * is given, and the same pointer the core hands back to
+ * gui_search_forward/back_state) to its prev/next buttons, so those two
+ * core-driven callbacks can reach the right dialog's UI. */
+QMap<void *, QPair<QPushButton *, QPushButton *>> &findDialogButtons()
+{
+    static QMap<void *, QPair<QPushButton *, QPushButton *>> map;
+    return map;
+}
+
+} // namespace
+
+extern "C" void gui_search_forward_state(bool active, void *p)
+{
+    auto it = findDialogButtons().find(p);
+    if (it != findDialogButtons().end()) {
+        it->second->setEnabled(active);
+    }
+}
+
+extern "C" void gui_search_back_state(bool active, void *p)
+{
+    auto it = findDialogButtons().find(p);
+    if (it != findDialogButtons().end()) {
+        it->first->setEnabled(active);
+    }
+}
 
 namespace besra {
 
@@ -96,6 +127,11 @@ void showFindInPage(QWidget *parent, struct browser_window *bw)
     QObject::connect(next_button, &QPushButton::clicked, dialog, [=] { do_search(true); });
     QObject::connect(prev_button, &QPushButton::clicked, dialog, [=] { do_search(false); });
     QObject::connect(field, &QLineEdit::returnPressed, dialog, [=] { do_search(true); });
+
+    findDialogButtons()[dialog] = {prev_button, next_button};
+    QObject::connect(dialog, &QObject::destroyed, dialog, [dialog] {
+        findDialogButtons().remove(dialog);
+    });
 
     dialog->show();
     field->setFocus();

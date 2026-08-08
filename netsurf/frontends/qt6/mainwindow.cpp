@@ -171,6 +171,9 @@ void BesraWindow::refreshChrome(BrowserTab *tab)
     if (index >= 0) {
         QString label = tab->title().isEmpty() ? tr("New Tab") : tab->title();
         tabs_->setTabText(index, label.left(32));
+        if (!tab->favicon().isNull()) {
+            tabs_->setTabIcon(index, tab->favicon());
+        }
     }
 
     if (tab != currentTab()) {

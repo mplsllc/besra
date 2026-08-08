@@ -231,6 +231,14 @@ void BrowserTab::setLoading(bool loading)
     }
 }
 
+void BrowserTab::setFavicon(const QIcon &icon)
+{
+    favicon_ = icon;
+    if (window_) {
+        window_->refreshChrome(this);
+    }
+}
+
 void BrowserTab::updateContentExtent()
 {
     int width = 0, height = 0;

@@ -34,18 +34,8 @@ extern "C" {
 #include "desktop/searchweb.h"
 }
 
-/* Find-in-page forward/back button state: the find dialog (dialogs.cpp's
- * showFindInPage) doesn't currently reflect these into its own buttons;
- * cosmetic, not a functional gap (search itself works). */
-extern "C" void gui_search_forward_state(bool active, void *p) {
-    (void)active;
-    (void)p;
-}
-
-extern "C" void gui_search_back_state(bool active, void *p) {
-    (void)active;
-    (void)p;
-}
+/* gui_search_forward_state/back_state: implemented in dialogs.cpp
+ * (they need to reach the find-in-page dialog's buttons). */
 
 extern "C" void gui_clipboard_get(char **buffer, size_t *length) {
     QString text = QApplication::clipboard()->text();
