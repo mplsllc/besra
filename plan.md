@@ -60,13 +60,13 @@ vision/strategy and roadmap, and `CLAUDE.md` for architecture and build notes.
   superseded entirely by the per-lib `CMakeLists.txt` from Step 3) was removed. This
   pass finished the job: 7 of the 10 READMEs (libwapcaplet, libparserutils, libhubbub,
   libdom, libcss, libsvgtiny, libnsutils) still described a standalone GNU-make build,
-  down to `svn co`-ing sibling libraries and installing to `/usr/local` — actively
+  down to `svn co`-ing sibling libraries and installing to `/usr/local`, actively
   wrong now, not just stale (e.g. libhubbub's README told you to fetch and build your
   own separate libparserutils). Replaced those sections with a short, accurate note
   pointing at the top-level CMake build; kept the genuinely-still-useful content
   (overview, rationale, API usage, test-driver pointers). Also cleared out stray local
   `build/` artifact directories (already gitignored, never tracked, just disk clutter).
-  No source-tree/`#include`-path merge was done — the per-lib `include/<name>/` +
+  No source-tree/`#include`-path merge was done: the per-lib `include/<name>/` +
   `src/` layout stays as-is; that's a large, high-risk, low-value mechanical rewrite
   with no concrete benefit distinct from what's already fixed here.
 
