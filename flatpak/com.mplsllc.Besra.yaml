@@ -1,4 +1,4 @@
-app-id: io.github.mplsllc.Besra
+app-id: com.mplsllc.Besra
 runtime: org.kde.Platform
 runtime-version: '6.9'
 sdk: org.kde.Sdk
