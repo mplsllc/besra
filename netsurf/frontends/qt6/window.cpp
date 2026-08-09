@@ -7,6 +7,7 @@
 #include "browsertab.h"
 #include "mainwindow.h"
 
+#include <cstdio>
 #include <QApplication>
 #include <QCursor>
 #include <QMenu>
@@ -24,6 +25,7 @@ extern "C" {
 #include "netsurf/mouse.h"
 #include "netsurf/window.h"
 #include "netsurf/form.h"
+#include "netsurf/console.h"
 #include "utils/nsurl.h"
 #include "desktop/browser_history.h"
 }
@@ -219,4 +221,26 @@ extern "C" void gui_window_file_gadget_open(struct gui_window *gw, struct hlcach
         browser_window_set_gadget_filename(gw->tab->browserWindow(), gadget,
             path.toUtf8().constData());
     }
+}
+
+extern "C" void gui_window_console_log(struct gui_window *gw,
+        browser_window_console_source src, const char *msg, size_t msglen,
+        browser_window_console_flags flags)
+{
+    (void)gw;
+
+    const char *level = "log";
+    switch (flags & BW_CS_FLAG_LEVEL_MASK) {
+    case BW_CS_FLAG_LEVEL_DEBUG: level = "debug"; break;
+    case BW_CS_FLAG_LEVEL_LOG:   level = "log"; break;
+    case BW_CS_FLAG_LEVEL_INFO:  level = "info"; break;
+    case BW_CS_FLAG_LEVEL_WARN:  level = "warn"; break;
+    case BW_CS_FLAG_LEVEL_ERROR: level = "error"; break;
+    default: break;
+    }
+
+    const char *source = (src == BW_CS_SCRIPT_ERROR) ? "script error"
+        : (src == BW_CS_SCRIPT_CONSOLE) ? "console" : "input";
+
+    fprintf(stderr, "[js %s/%s] %.*s\n", source, level, static_cast<int>(msglen), msg);
 }

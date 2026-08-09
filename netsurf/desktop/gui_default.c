@@ -159,10 +159,3 @@ void gui_window_drag_save_object(struct gui_window *gw, struct hlcache_handle *c
 void gui_window_drag_save_selection(struct gui_window *gw, const char *selection)
 {
 }
-
-void gui_window_console_log(struct gui_window *gw,
-		browser_window_console_source src,
-		const char *msg, size_t msglen,
-		browser_window_console_flags flags)
-{
-}

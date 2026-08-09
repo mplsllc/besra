@@ -26,6 +26,9 @@ static nserror set_defaults(struct nsoption_s *defaults)
     nsoption_set_charp(font_mono, strdup("Monospace"));
     nsoption_set_charp(font_cursive, strdup("Serif"));
     nsoption_set_charp(font_fantasy, strdup("Serif"));
+    /* Unlike stock NetSurf, JS is a first-class feature here, not an
+     * off-by-default afterthought: see README.md / docs/strategy.md. */
+    nsoption_set_bool(enable_javascript, true);
     return NSERROR_OK;
 }
 

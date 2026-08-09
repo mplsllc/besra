@@ -1,4 +1,4 @@
-add_subdirectory(content/handlers/javascript/duktape)
+add_subdirectory(content/handlers/javascript/quickjs)
 
 # Host tools
 find_package(ZLIB REQUIRED)
@@ -21,17 +21,21 @@ file(GLOB_RECURSE NETSURF_CORE_SOURCES
     utils/*.c
 )
 
-file(GLOB_RECURSE EXCLUDE_DUKTAPE content/handlers/javascript/duktape/*.c)
-file(GLOB EXCLUDE_IMAGE_HANDLERS 
-    content/handlers/image/nssprite.c 
-    content/handlers/image/rsvg.c 
-    content/handlers/image/rsvg246.c 
-    content/handlers/image/jpegxl.c 
-    content/handlers/image/video.c 
+file(GLOB_RECURSE EXCLUDE_JS_ENGINES
+    content/handlers/javascript/duktape/*.c
+    content/handlers/javascript/quickjs/*.c
+    content/handlers/javascript/none/*.c
+)
+file(GLOB EXCLUDE_IMAGE_HANDLERS
+    content/handlers/image/nssprite.c
+    content/handlers/image/rsvg.c
+    content/handlers/image/rsvg246.c
+    content/handlers/image/jpegxl.c
+    content/handlers/image/video.c
     content/handlers/image/webp.c
 )
-if(EXCLUDE_DUKTAPE)
-    list(REMOVE_ITEM NETSURF_CORE_SOURCES ${EXCLUDE_DUKTAPE})
+if(EXCLUDE_JS_ENGINES)
+    list(REMOVE_ITEM NETSURF_CORE_SOURCES ${EXCLUDE_JS_ENGINES})
 endif()
 if(EXCLUDE_IMAGE_HANDLERS)
     list(REMOVE_ITEM NETSURF_CORE_SOURCES ${EXCLUDE_IMAGE_HANDLERS})
@@ -62,7 +66,6 @@ target_link_libraries(netsurf PUBLIC
     svgtiny
     utf8proc
     nslog
-    duktape
     js-bindings
 )
 
