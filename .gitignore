@@ -2,6 +2,9 @@
 build/
 *.o
 *.a
+flatpak/build-dir/
+flatpak/.flatpak-builder/
+flatpak/*.flatpak
 # editor
 .DS_Store
 *.swp

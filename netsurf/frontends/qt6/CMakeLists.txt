@@ -38,3 +38,9 @@ endif()
 target_include_directories(besra PRIVATE
     ${CMAKE_SOURCE_DIR}/netsurf
 )
+
+install(TARGETS besra RUNTIME DESTINATION bin)
+install(FILES ${CMAKE_SOURCE_DIR}/flatpak/io.github.mplsllc.Besra.desktop
+    DESTINATION share/applications)
+install(FILES ${CMAKE_SOURCE_DIR}/flatpak/io.github.mplsllc.Besra.png
+    DESTINATION share/icons/hicolor/256x256/apps)

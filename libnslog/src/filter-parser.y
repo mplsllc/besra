@@ -26,6 +26,7 @@ static void filter_error(YYLTYPE *loc, nslog_filter_t **output, const char *msg)
 
 %locations
 %define api.pure full
+%define api.prefix {filter_}
 %parse-param { nslog_filter_t **output }
 
 %union {
