@@ -5,6 +5,8 @@ build/
 flatpak/build-dir/
 flatpak/.flatpak-builder/
 flatpak/*.flatpak
+.flatpak-builder/
+.infisical.json
 # editor
 .DS_Store
 *.swp

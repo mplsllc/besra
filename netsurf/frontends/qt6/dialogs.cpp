@@ -1,4 +1,5 @@
 #include "dialogs.h"
+#include "aboutdialog.h"
 
 #include <QDialog>
 #include <QVBoxLayout>
@@ -59,10 +60,8 @@ namespace besra {
 
 void showAbout(QWidget *parent)
 {
-    QMessageBox::about(parent, QObject::tr("About Besra"),
-        QObject::tr("<h3>Besra</h3>"
-                     "<p>A lightweight, independent web engine for the readable modern web.</p>"
-                     "<p>Built on the NetSurf engine core.</p>"));
+    AboutDialog dlg(parent);
+    dlg.exec();
 }
 
 void showViewSource(QWidget *parent, struct browser_window *bw)

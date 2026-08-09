@@ -12,6 +12,7 @@ extern "C" {
 #include <netsurf/browser_window.h>
 #include <content/fetch.h>
 #include <utils/nsoption.h>
+#include <utils/log.h>
 #include <desktop/bitmap.h>
 void schedule_run(void);
 }
@@ -114,6 +115,14 @@ private:
 
 int main(int argc, char *argv[])
 {
+    /* Must run before QApplication's constructor: it strips -v/-V <file>
+     * from argv (matching stock NetSurf's CLI convention) and, critically,
+     * calls nslog_uncork() -- without it, nslog stays corked from startup
+     * and every NSLOG() call in the entire codebase silently accumulates
+     * in an unbounded internal buffer forever instead of being emitted or
+     * discarded. */
+    nslog_init(NULL, &argc, argv);
+
     QApplication app(argc, argv);
 
     besra::load_messages();
@@ -141,6 +150,7 @@ int main(int argc, char *argv[])
 
     QObject::connect(&app, &QApplication::aboutToQuit, [] {
         besra::finalizeHotlist();
+        nslog_finalise();
     });
 
     return app.exec();

@@ -16,6 +16,7 @@ add_executable(besra
     browsertab.cpp
     mainwindow.cpp
     dialogs.cpp
+    aboutdialog.cpp
     corewindow.cpp
     panels.cpp
     preferences.cpp
@@ -37,6 +38,10 @@ endif()
 
 target_include_directories(besra PRIVATE
     ${CMAKE_SOURCE_DIR}/netsurf
+)
+
+target_compile_definitions(besra PRIVATE
+    "BESRA_VERSION=\"${PROJECT_VERSION}\""
 )
 
 install(TARGETS besra RUNTIME DESTINATION bin)
