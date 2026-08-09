@@ -1,6 +1,6 @@
 #!/bin/bash
 # Build the current source tree into the persistent flatpak repo served at
-# https://desktop.mp.ls/repo, so `flatpak update` picks it up on any machine
+# https://flatpak.mp.ls/repo, so `flatpak update` picks it up on any machine
 # with the "besra" remote added (see README.md in this directory for the
 # remote-add/install commands).
 #
@@ -22,5 +22,5 @@ flatpak-builder --repo="$REPO" --force-clean "$ROOT/build-dir" \
 
 flatpak build-update-repo "$REPO"
 
-echo "--- published to $REPO, served at https://desktop.mp.ls/repo ---"
-echo "verify with: curl -sI https://desktop.mp.ls/repo/config"
+echo "--- published to $REPO, served at https://flatpak.mp.ls/repo ---"
+echo "verify with: curl -sI https://flatpak.mp.ls/repo/config"

@@ -1,12 +1,12 @@
 # Flatpak packaging
 
 `com.mplsllc.Besra.yaml` is the manifest; `release.sh` builds it and publishes
-to the ostree repo served at `https://desktop.mp.ls/repo`.
+to the ostree repo served at `https://flatpak.mp.ls/repo`.
 
 ## Install (on any machine, once published)
 
 ```sh
-flatpak remote-add --user --no-gpg-verify --if-not-exists besra https://desktop.mp.ls/repo
+flatpak remote-add --user --no-gpg-verify --if-not-exists besra https://flatpak.mp.ls/repo
 flatpak install --user besra com.mplsllc.Besra
 flatpak run com.mplsllc.Besra
 ```
@@ -14,7 +14,7 @@ flatpak run com.mplsllc.Besra
 `flatpak update --user com.mplsllc.Besra` picks up new releases after the
 next `release.sh` run.
 
-## Publish a new build (on the server hosting desktop.mp.ls)
+## Publish a new build (on the server hosting flatpak.mp.ls)
 
 ```sh
 flatpak/release.sh
