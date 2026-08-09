@@ -25,3 +25,14 @@ Source: git://git.netsurf-browser.org/<component>.git
 | `libsvgtiny` | `7ede71b572a1672ee9ddb7b3e626ddb17b4c8170` |
 | `libnsfb` | `b701cdce7241c3747ccd78658a365db0983ebe24` |
 | `netsurf` | `a471a0d44274ec57fee5e5f30ae59fbd2ad02656` |
+
+## Post-import additions
+
+Components vendored after the initial NetSurf import, same hard-fork convention
+(real source, pinned SHA recorded here, no upstream remote kept):
+
+| Component | Upstream commit at import | Source |
+|---|---|---|
+| `libquickjs` | `954dc53628e36891f93c359aa60895c2ae3dac6b` | `https://github.com/quickjs-ng/quickjs.git` (imported 2026-08-08) |
+
+`libnsfb` (row above) was later deleted; see plan.md Step 6.

@@ -38,5 +38,10 @@ add_subdirectory(libutf8proc)
 add_subdirectory(libnslog)
 add_subdirectory(nsgenbind)
 
+set(QJS_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(QJS_BUILD_CLI_STATIC OFF CACHE BOOL "" FORCE)
+set(QJS_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+add_subdirectory(libquickjs)
+
 # Netsurf core and frontend
 add_subdirectory(netsurf)
