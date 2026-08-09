@@ -51,6 +51,7 @@ target_compile_definitions(netsurf PUBLIC
     WITH_JPEG
     WITH_PNG
     WITH_NS_SVG
+    WITH_CURL
 )
 
 target_link_libraries(netsurf PUBLIC
