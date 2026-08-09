@@ -40,7 +40,3 @@ target_include_directories(besra PRIVATE
 )
 
 install(TARGETS besra RUNTIME DESTINATION bin)
-install(FILES ${CMAKE_SOURCE_DIR}/flatpak/com.mplsllc.Besra.desktop
-    DESTINATION share/applications)
-install(FILES ${CMAKE_SOURCE_DIR}/flatpak/com.mplsllc.Besra.png
-    DESTINATION share/icons/hicolor/256x256/apps)

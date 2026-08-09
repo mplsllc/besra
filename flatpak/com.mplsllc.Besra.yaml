@@ -24,3 +24,20 @@ modules:
           - build
           - .git
           - .private
+    post-install:
+      # CMake's own install() rules (root CMakeLists.txt) install the
+      # .desktop/icon under their plain "besra" name for the .deb build —
+      # Flatpak requires them to match the app ID exactly, so they're
+      # re-installed here under com.mplsllc.Besra rather than renaming the
+      # source-of-truth packaging/besra.desktop (which the .deb still needs
+      # under its own plain name).
+      - install -Dm644 packaging/besra.desktop
+          /app/share/applications/com.mplsllc.Besra.desktop
+      - sed -i 's/^Icon=besra$/Icon=com.mplsllc.Besra/'
+          /app/share/applications/com.mplsllc.Besra.desktop
+      - install -Dm644 packaging/icons/hicolor/scalable/apps/besra.svg
+          /app/share/icons/hicolor/scalable/apps/com.mplsllc.Besra.svg
+      - for size in 16 22 24 32 48 64 128 256; do
+          install -Dm644 packaging/icons/hicolor/${size}x${size}/apps/besra.png
+            /app/share/icons/hicolor/${size}x${size}/apps/com.mplsllc.Besra.png;
+        done

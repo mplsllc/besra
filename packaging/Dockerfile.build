@@ -1,0 +1,12 @@
+# Prebuilt toolchain image for release.sh — bakes in every apt package
+# build-in-debian.sh needs, so a release build only pays the apt-get cost
+# once (when this Dockerfile or its package list changes) instead of on
+# every single release. Rebuild with:
+#   docker build -f packaging/Dockerfile.build -t besra-builder .
+FROM debian:bookworm
+
+RUN apt-get update -qq && apt-get install -y -qq \
+    cmake build-essential flex bison pkg-config dpkg-dev file \
+    qt6-base-dev \
+    libcurl4-openssl-dev libssl-dev libxml2-dev libpng-dev libjpeg62-turbo-dev zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
