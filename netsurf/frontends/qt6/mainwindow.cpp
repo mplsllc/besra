@@ -313,7 +313,13 @@ void BesraWindow::onNewTab()
 {
     nsurl *url = nullptr;
     if (nsurl_create("about:blank", &url) == NSERROR_OK) {
-        browser_window_create(BW_CREATE_HISTORY, url, nullptr, nullptr, nullptr);
+        /* BW_CREATE_TAB is required here, not just BW_CREATE_HISTORY --
+         * without it there's nothing telling gui_window_create() to
+         * open in the current window's tab strip, so it falls through
+         * to opening a whole new BesraWindow instead. */
+        browser_window_create(
+            static_cast<browser_window_create_flags>(BW_CREATE_HISTORY | BW_CREATE_TAB),
+            url, nullptr, nullptr, nullptr);
         nsurl_unref(url);
     }
     url_bar_->setFocus();
