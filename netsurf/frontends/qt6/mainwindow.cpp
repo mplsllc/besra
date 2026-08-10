@@ -9,10 +9,11 @@
 #include <QToolButton>
 #include <QLineEdit>
 #include <QLabel>
-#include <QTabWidget>
 #include <QTabBar>
+#include <QStackedWidget>
 #include <QStatusBar>
 #include <QCloseEvent>
+#include <QKeyEvent>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QKeySequence>
@@ -44,19 +45,33 @@ BesraWindow::BesraWindow(QWidget *parent) : QMainWindow(parent)
 {
     registry().prepend(this);
 
-    tabs_ = new QTabWidget(this);
-    tabs_->setTabsClosable(true);
-    tabs_->setMovable(true);
-    setCentralWidget(tabs_);
+    tab_stack_ = new QStackedWidget(this);
+    setCentralWidget(tab_stack_);
+
+    /* Own toolbar, added before the nav/address toolbar so it docks
+     * above it (QMainWindow stacks same-area toolbars in call order). */
+    QToolBar *tab_toolbar = addToolBar(tr("Tabs"));
+    tab_toolbar->setMovable(false);
+    tab_bar_ = new QTabBar(tab_toolbar);
+    tab_bar_->setTabsClosable(true);
+    tab_bar_->setMovable(true);
+    tab_bar_->setExpanding(false);
+    tab_toolbar->addWidget(tab_bar_);
 
     status_label_ = new QLabel(this);
     statusBar()->addWidget(status_label_, 1);
 
-    buildToolbar();
-    buildMenus();
+    QList<QMenu *> menus = buildMenus();
+    /* Traditional menu bar stays hidden until a bare Alt press reveals
+     * it (see keyReleaseEvent) -- its actions are always reachable via
+     * the hamburger menu on the address bar regardless. */
+    menuBar()->setVisible(false);
 
-    connect(tabs_, &QTabWidget::currentChanged, this, &BesraWindow::onCurrentTabChanged);
-    connect(tabs_, &QTabWidget::tabCloseRequested, this, &BesraWindow::onTabCloseRequested);
+    buildToolbar(menus);
+
+    connect(tab_bar_, &QTabBar::currentChanged, this, &BesraWindow::onCurrentTabChanged);
+    connect(tab_bar_, &QTabBar::tabCloseRequested, this, &BesraWindow::onTabCloseRequested);
+    connect(tab_bar_, &QTabBar::tabMoved, this, &BesraWindow::onTabMoved);
 
     resize(1200, 800);
     setWindowTitle(QStringLiteral("Besra"));
@@ -67,7 +82,7 @@ BesraWindow::~BesraWindow()
     registry().removeAll(this);
 }
 
-void BesraWindow::buildToolbar()
+void BesraWindow::buildToolbar(const QList<QMenu *> &menus)
 {
     QToolBar *bar = addToolBar(tr("Navigation"));
     bar->setMovable(false);
@@ -94,9 +109,26 @@ void BesraWindow::buildToolbar()
     url_bar_->setPlaceholderText(tr("Enter address"));
     connect(url_bar_, &QLineEdit::returnPressed, this, &BesraWindow::onNavigate);
     bar->addWidget(url_bar_);
+
+    /* Hamburger menu: folds every File/Edit/View/History/Bookmarks/
+     * Tools/Help action into one button, since the menu bar itself is
+     * hidden by default. Reuses the same QMenu objects buildMenus()
+     * already attached to the (hidden) menu bar as submenus here --
+     * Qt allows one QMenu to be the target of actions in more than one
+     * parent menu, so nothing is built twice. */
+    QToolButton *hamburger = new QToolButton(bar);
+    hamburger->setText(QStringLiteral("☰"));
+    hamburger->setToolTip(tr("Menu"));
+    hamburger->setPopupMode(QToolButton::InstantPopup);
+    QMenu *hamburger_menu = new QMenu(hamburger);
+    for (QMenu *menu : menus) {
+        hamburger_menu->addMenu(menu);
+    }
+    hamburger->setMenu(hamburger_menu);
+    bar->addWidget(hamburger);
 }
 
-void BesraWindow::buildMenus()
+QList<QMenu *> BesraWindow::buildMenus()
 {
     QMenu *file_menu = menuBar()->addMenu(tr("&File"));
     file_menu->addAction(tr("New &Tab"), this, &BesraWindow::onNewTab, QKeySequence::AddTab);
@@ -135,44 +167,50 @@ void BesraWindow::buildMenus()
 
     QMenu *help_menu = menuBar()->addMenu(tr("&Help"));
     help_menu->addAction(tr("&About Besra"), this, &BesraWindow::onShowAbout);
+
+    return {file_menu, edit_menu, view_menu, history_menu,
+            bookmarks_menu, tools_menu, help_menu};
 }
 
 BrowserTab *BesraWindow::addTab(struct browser_window *bw, bool foreground)
 {
-    BrowserTab *tab = new BrowserTab(bw, this, tabs_);
-    int index = tabs_->addTab(tab, tr("New Tab"));
+    BrowserTab *tab = new BrowserTab(bw, this, tab_stack_);
+    tab_stack_->addWidget(tab);
+    int index = tab_bar_->addTab(tr("New Tab"));
     if (foreground) {
-        tabs_->setCurrentIndex(index);
+        tab_bar_->setCurrentIndex(index);
+        tab_stack_->setCurrentIndex(index);
     }
     return tab;
 }
 
 void BesraWindow::removeTab(BrowserTab *tab)
 {
-    int index = tabs_->indexOf(tab);
+    int index = tab_stack_->indexOf(tab);
     if (index >= 0) {
-        tabs_->removeTab(index);
+        tab_bar_->removeTab(index);
+        tab_stack_->removeWidget(tab);
     }
     tab->deleteLater();
 
-    if (tabs_->count() == 0) {
+    if (tab_bar_->count() == 0) {
         close();
     }
 }
 
 BrowserTab *BesraWindow::currentTab() const
 {
-    return qobject_cast<BrowserTab *>(tabs_->currentWidget());
+    return qobject_cast<BrowserTab *>(tab_stack_->currentWidget());
 }
 
 void BesraWindow::refreshChrome(BrowserTab *tab)
 {
-    int index = tabs_->indexOf(tab);
+    int index = tab_stack_->indexOf(tab);
     if (index >= 0) {
         QString label = tab->title().isEmpty() ? tr("New Tab") : tab->title();
-        tabs_->setTabText(index, label.left(32));
+        tab_bar_->setTabText(index, label.left(32));
         if (!tab->favicon().isNull()) {
-            tabs_->setTabIcon(index, tab->favicon());
+            tab_bar_->setTabIcon(index, tab->favicon());
         }
     }
 
@@ -207,7 +245,7 @@ BrowserTab *BesraWindow::createTabOrWindow(struct browser_window *bw,
         target->show();
     }
 
-    bool foreground = (flags & GW_CREATE_FOREGROUND) || target->tabs_->count() == 0;
+    bool foreground = (flags & GW_CREATE_FOREGROUND) || target->tab_bar_->count() == 0;
     BrowserTab *tab = target->addTab(bw, foreground);
 
     if ((flags & GW_CREATE_FOCUS_LOCATION) && foreground) {
@@ -367,7 +405,7 @@ void BesraWindow::onShowAbout() { besra::showAbout(this); }
 
 void BesraWindow::onCurrentTabChanged(int index)
 {
-    (void)index;
+    tab_stack_->setCurrentIndex(index);
     if (BrowserTab *tab = currentTab()) {
         refreshChrome(tab);
         tab->renderWidget()->setFocus();
@@ -376,8 +414,22 @@ void BesraWindow::onCurrentTabChanged(int index)
 
 void BesraWindow::onTabCloseRequested(int index)
 {
-    if (auto *tab = qobject_cast<BrowserTab *>(tabs_->widget(index))) {
+    if (auto *tab = qobject_cast<BrowserTab *>(tab_stack_->widget(index))) {
         browser_window_destroy(tab->browserWindow());
+    }
+}
+
+void BesraWindow::onTabMoved(int from, int to)
+{
+    /* Keep tab_stack_'s widget order matching tab_bar_'s (drag-to-
+     * reorder), since every other lookup assumes index parity between
+     * the two. QStackedWidget has no direct "move" call; remove +
+     * re-insert at the target index does the same thing. */
+    QWidget *widget = tab_stack_->widget(from);
+    if (widget != nullptr) {
+        tab_stack_->removeWidget(widget);
+        tab_stack_->insertWidget(to, widget);
+        tab_stack_->setCurrentIndex(tab_bar_->currentIndex());
     }
 }
 
@@ -391,4 +443,17 @@ void BesraWindow::focusInEvent(QFocusEvent *event)
     QMainWindow::focusInEvent(event);
     registry().removeAll(this);
     registry().prepend(this);
+}
+
+void BesraWindow::keyReleaseEvent(QKeyEvent *event)
+{
+    /* Bare Alt press/release (no other modifiers, not a mnemonic combo
+     * like Alt+F) toggles the traditional menu bar, which is otherwise
+     * hidden -- matches Firefox/Chrome/Explorer's "press Alt to reveal
+     * the hidden menu bar" convention. */
+    if (event->key() == Qt::Key_Alt && !event->isAutoRepeat()) {
+        menuBar()->setVisible(!menuBar()->isVisible());
+        return;
+    }
+    QMainWindow::keyReleaseEvent(event);
 }

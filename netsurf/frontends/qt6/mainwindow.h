@@ -10,9 +10,11 @@ struct gui_window;
 }
 
 class QLineEdit;
-class QTabWidget;
+class QTabBar;
+class QStackedWidget;
 class QToolButton;
 class QLabel;
+class QMenu;
 class BrowserTab;
 
 /**
@@ -53,6 +55,7 @@ public:
 protected:
     void closeEvent(QCloseEvent *event) override;
     void focusInEvent(QFocusEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
 
 private slots:
     void onNavigate();
@@ -78,13 +81,29 @@ private slots:
     void onShowAbout();
     void onCurrentTabChanged(int index);
     void onTabCloseRequested(int index);
+    void onTabMoved(int from, int to);
 
 private:
-    void buildMenus();
-    void buildToolbar();
+    /** Builds the traditional File/Edit/View/... menu bar (hidden by
+     * default, revealed by a bare Alt press) and returns its top-level
+     * menus in order so buildToolbar() can also fold them into the
+     * hamburger menu -- the same QMenu objects are reused in both
+     * places rather than built twice. */
+    QList<QMenu *> buildMenus();
+    void buildToolbar(const QList<QMenu *> &menus);
     void navigateTo(const QString &text);
 
-    QTabWidget *tabs_;
+    /** count()/currentIndex() etc. always match between these two --
+     * every mutation below goes through both in lockstep. tab_bar_
+     * lives in its own toolbar (above the nav/address toolbar, per the
+     * chrome layout); tab_stack_ is the central widget holding each
+     * tab's actual BrowserTab page. Kept as two separate widgets rather
+     * than one QTabWidget because QTabWidget always renders its tab bar
+     * directly atop its own page area (part of the central widget), so
+     * there is no way to place its tab bar in a toolbar above another
+     * toolbar. */
+    QTabBar *tab_bar_;
+    QStackedWidget *tab_stack_;
     QLineEdit *url_bar_;
     QToolButton *back_button_;
     QToolButton *forward_button_;
