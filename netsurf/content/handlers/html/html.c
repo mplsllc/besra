@@ -612,6 +612,20 @@ html_create(const content_handler *handler,
 	html_content *html;
 	nserror error;
 
+	/* Clear the doc-global inline-extras custom-property table at the
+	 * start of every new HTML document so element-scoped --custom-prop
+	 * declarations from the previous page don't bleed into the new one.
+	 *
+	 * Known imprecision (ported as-is): html_create runs for every HTML
+	 * content, and an iframe is HTML content too, so loading an iframe
+	 * clears the parent document's inline custom properties. Fixing
+	 * this needs a real top-level-navigation signal, not this
+	 * every-content-create hook; not fixed here, matching upstream. */
+	{
+		extern void css_inline_extras_clear(void);
+		css_inline_extras_clear();
+	}
+
 	html = calloc(1, sizeof(html_content));
 	if (html == NULL)
 		return NSERROR_NOMEM;

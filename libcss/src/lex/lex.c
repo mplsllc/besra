@@ -636,6 +636,23 @@ css_error CDCOrIdentOrFunctionOrNPD(css_lexer *lexer, css_token **token)
 			APPEND(lexer, cptr, clen);
 
 			t->type = CSS_TOKEN_CDC;
+		} else if (startNMStart(c)) {
+			/* "--" followed by nmstart is a CSS Custom Property
+			 * identifier. Keep both dashes in the token buffer
+			 * and continue consuming as an IDENT so the token
+			 * emitted is a single IDENT('--foo') rather than
+			 * CHAR('-') + IDENT('-foo'). */
+			if (c != '\\') {
+				APPEND(lexer, cptr, clen);
+				lexer->state = sIDENT;
+				lexer->substate = 0;
+				return IdentOrFunction(lexer, token);
+			} else {
+				lexer->bytesReadForToken += clen;
+				lexer->state = sIDENT;
+				lexer->substate = Escape;
+				goto escape;
+			}
 		} else {
 			/* Remove the '-' we read above */
 			lexer->bytesReadForToken -= 1;

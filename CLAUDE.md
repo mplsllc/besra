@@ -122,6 +122,14 @@ grow.
   call-site substitution (renaming, removing a parameter, direct-call conversion) is
   fine; changing layout behavior is not, until the refactor is complete and this note
   is revisited.
+  **Exception (2026-08-09, explicit maintainer sign-off): lifted specifically for the
+  MacSurf CSS-parity project** (porting var()/custom properties, CSS Grid, gradients,
+  box-shadow, border-radius, transforms, and related layout/redraw consumers from
+  MacSurf's engine, which forked NetSurf independently and built substantial native
+  CSS feature support Besra's stock 3.12-dev baseline lacks — see
+  `.private/docs/macsurf-css-parity.md` for the tracked gap/plan). Changes made under
+  this exception should stay scoped to what CSS parity actually requires, not become
+  a general excuse to touch layout.c for unrelated reasons.
 - **Platform-layer code should target Qt/libcurl, not bare glibc.** NetSurf's original
   platform shims supported 8 targets. When simplifying, don't replace that generality
   with Linux-only glibc calls; replace it with Qt's portable equivalents (QTimer,

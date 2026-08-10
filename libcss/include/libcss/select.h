@@ -233,6 +233,16 @@ css_error css_select_font_faces(css_select_ctx *ctx,
 css_error css_select_font_faces_results_destroy(
 		css_select_font_faces_results *results);
 
+/* Register a stylesheet's custom_properties list into the doc-global
+ * inline-extras table. Used by the frontend's inline-style creation path
+ * so element-scoped --custom-props (parent defines, child uses) resolve
+ * correctly. Tokens are deep-cloned; caller retains ownership of `sheet`. */
+css_error css_inline_extras_register_sheet(const css_stylesheet *sheet);
+
+/* Clear the doc-global inline-extras table. Call on new-document
+ * navigation to prevent cross-page bleed. */
+void css_inline_extras_clear(void);
+
 #ifdef __cplusplus
 }
 #endif

@@ -31,6 +31,10 @@ typedef struct css_style {
 	uint32_t used;		      /**< number of code entries used */
 	uint32_t allocated;	      /**< number of allocated code entries */
 	struct css_stylesheet *sheet; /**< containing sheet */
+	struct css_deferred_decl *deferred; /**< Declarations deferred until
+					* select time because they reference
+					* var(). NULL when the style has no
+					* var() dependencies. */
 } css_style;
 
 typedef enum css_selector_type {
@@ -214,6 +218,10 @@ struct css_stylesheet {
 						 * length in entries */
 	uint32_t string_vector_c;               /**< The number of string
 						 * vector entries used */
+
+	struct css_cp_entry *custom_properties; /**< Head of this sheet's
+						 * CSS custom property
+						 * ("--name") definitions. */
 };
 
 css_error css__stylesheet_style_create(css_stylesheet *sheet,

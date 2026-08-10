@@ -71,6 +71,17 @@ typedef struct css_select_state {
 	const css_media *media;		/* Currently active media spec */
 	const css_unit_ctx *unit_ctx;	/* Unit conversion context. */
 	css_select_results *results;	/* Result set to populate */
+	struct css_select_ctx *select_ctx; /* Owning select context —
+					    * needed by deferred (var())
+					    * resolution to reach other
+					    * sheets. Set at state init. */
+	const css_stylesheet *inline_style;
+	/* Inline style sheet for the current element, if any. Per-element
+	 * scope: holds custom-property declarations from
+	 * style="--name: value" attributes. The select_ctx walks doc-level
+	 * sheets only; without this, var() references in author CSS that
+	 * point at element-scoped custom properties couldn't be resolved.
+	 * lookup_var() consults this when present. */
 
 	/** UA and user styles for handling revert property value. */
 	struct revert_data *revert; /* Length: CSS_ORIGIN_AUTHOR */

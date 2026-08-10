@@ -11,6 +11,7 @@
 
 #include "stylesheet.h"
 #include "bytecode/bytecode.h"
+#include "parse/custom_properties.h"
 #include "parse/language.h"
 #include "parse/mq.h"
 #include "utils/parserutilserror.h"
@@ -277,6 +278,11 @@ css_error css_stylesheet_destroy(css_stylesheet *sheet)
 	}
 
 	css__selector_hash_destroy(sheet->selectors);
+
+	if (sheet->custom_properties != NULL) {
+		css__cp_entry_list_destroy(sheet->custom_properties);
+		sheet->custom_properties = NULL;
+	}
 
 	/* These three may have been destroyed when parsing completed */
 	if (sheet->parser_frontend != NULL)
@@ -648,6 +654,8 @@ css_error css__stylesheet_style_create(css_stylesheet *sheet, css_style **style)
 	if (sheet->cached_style != NULL) {
 		*style = sheet->cached_style;
 		sheet->cached_style = NULL;
+		/* Cached styles are reset on destroy; defensive clear. */
+		(*style)->deferred = NULL;
 		return CSS_OK;
 	}
 
@@ -665,6 +673,7 @@ css_error css__stylesheet_style_create(css_stylesheet *sheet, css_style **style)
 	s->allocated = CSS_STYLE_DEFAULT_SIZE;
 	s->used = 0;
 	s->sheet = sheet;
+	s->deferred = NULL;
 
 	*style = s;
 
@@ -698,6 +707,21 @@ css_error css__stylesheet_merge_style(css_style *target, css_style *style)
 			style->used * sizeof(css_code_t));
 
 	target->used += style->used;
+
+	/* Move any deferred (var()) declarations from source to target,
+	 * appending source's list at the tail of target's so cascade
+	 * source-order is preserved. */
+	if (style->deferred != NULL) {
+		if (target->deferred == NULL) {
+			target->deferred = style->deferred;
+		} else {
+			css_deferred_decl *tail = target->deferred;
+			while (tail->next != NULL)
+				tail = tail->next;
+			tail->next = style->deferred;
+		}
+		style->deferred = NULL;
+	}
 
 	return CSS_OK;
 
@@ -761,6 +785,13 @@ css_error css__stylesheet_style_destroy(css_style *style)
 		return CSS_BADPARM;
 
 	sheet = style->sheet;
+
+	/* Always free any attached deferred declarations up front — they are
+	 * never part of the cache. */
+	if (style->deferred != NULL) {
+		css__deferred_decl_list_destroy(style->deferred);
+		style->deferred = NULL;
+	}
 
 	if (sheet->cached_style == NULL) {
 		sheet->cached_style = style;

@@ -27,6 +27,7 @@ endforeach()
 set(CSS_SOURCES
     src/charset/detect.c
     src/lex/lex.c
+    src/parse/custom_properties.c
     src/parse/font_face.c
     src/parse/important.c
     src/parse/language.c
