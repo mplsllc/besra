@@ -109,6 +109,13 @@ BesraWindow::BesraWindow(QWidget *parent) : QMainWindow(parent)
     setCentralWidget(tab_stack_);
 
     buildTitleBar();
+    /* Without this, QMainWindow just flows same-area toolbars
+     * left-to-right on one row until they run out of width -- it does
+     * NOT reliably wrap the nav toolbar onto its own row below the
+     * title bar just because there are two of them. A narrower window
+     * showed exactly that: tabs, window buttons, back/forward/reload,
+     * and the address bar all crammed onto a single line. */
+    addToolBarBreak(Qt::TopToolBarArea);
 
     status_label_ = new QLabel(this);
     statusBar()->addWidget(status_label_, 1);
@@ -148,6 +155,12 @@ void BesraWindow::buildTitleBar()
     tab_bar_->setMovable(true);
     tab_bar_->setExpanding(false);
     bar->addWidget(tab_bar_);
+
+    QToolButton *new_tab_button = new QToolButton(bar);
+    new_tab_button->setText(QStringLiteral("+"));
+    new_tab_button->setToolTip(tr("New Tab"));
+    connect(new_tab_button, &QToolButton::clicked, this, &BesraWindow::onNewTab);
+    bar->addWidget(new_tab_button);
 
     /* Pushes the window-control buttons to the far right of the row,
      * same as the tab strip's own empty space -- clicks here also fall
