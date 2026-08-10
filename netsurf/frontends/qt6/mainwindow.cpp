@@ -14,6 +14,10 @@
 #include <QStatusBar>
 #include <QCloseEvent>
 #include <QKeyEvent>
+#include <QMouseEvent>
+#include <QWindow>
+#include <QIcon>
+#include <QSizePolicy>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QKeySequence>
@@ -28,6 +32,52 @@ extern "C" {
 #include "netsurf/window.h"
 #include "desktop/browser_history.h"
 }
+
+namespace {
+
+constexpr int kResizeMargin = 6;
+
+/** The tab-strip toolbar doubles as the window's title bar (frameless
+ * window -- see BesraWindow's constructor): clicking its own background
+ * (not any child widget like a tab or button) drags the window via the
+ * window manager's native move protocol, and double-clicking toggles
+ * maximize -- both standard title-bar behaviours otherwise lost once
+ * the native decoration is gone. */
+class TitleBarToolBar : public QToolBar {
+public:
+    TitleBarToolBar(const QString &title, QWidget *window)
+        : QToolBar(title, window), window_(window) {}
+
+protected:
+    void mousePressEvent(QMouseEvent *event) override
+    {
+        if (event->button() == Qt::LeftButton) {
+            if (QWindow *wh = window_->windowHandle()) {
+                wh->startSystemMove();
+                return;
+            }
+        }
+        QToolBar::mousePressEvent(event);
+    }
+
+    void mouseDoubleClickEvent(QMouseEvent *event) override
+    {
+        if (event->button() == Qt::LeftButton) {
+            if (window_->isMaximized()) {
+                window_->showNormal();
+            } else {
+                window_->showMaximized();
+            }
+            return;
+        }
+        QToolBar::mouseDoubleClickEvent(event);
+    }
+
+private:
+    QWidget *window_;
+};
+
+} // namespace
 
 QList<BesraWindow *> &BesraWindow::registry()
 {
@@ -45,18 +95,20 @@ BesraWindow::BesraWindow(QWidget *parent) : QMainWindow(parent)
 {
     registry().prepend(this);
 
+    /* Frameless: we draw our own title bar (buildTitleBar()) with tabs
+     * sharing the row with minimize/maximize/close, like Chrome/Edge.
+     * The OS gives us none of the usual title-bar behaviour for free
+     * once this is set -- drag-to-move, double-click-to-maximize, and
+     * edge/corner resize are all hand-implemented below via
+     * QWindow::startSystemMove()/startSystemResize(), which delegate
+     * the actual operation to the window manager rather than computing
+     * geometry by hand. */
+    setWindowFlag(Qt::FramelessWindowHint);
+
     tab_stack_ = new QStackedWidget(this);
     setCentralWidget(tab_stack_);
 
-    /* Own toolbar, added before the nav/address toolbar so it docks
-     * above it (QMainWindow stacks same-area toolbars in call order). */
-    QToolBar *tab_toolbar = addToolBar(tr("Tabs"));
-    tab_toolbar->setMovable(false);
-    tab_bar_ = new QTabBar(tab_toolbar);
-    tab_bar_->setTabsClosable(true);
-    tab_bar_->setMovable(true);
-    tab_bar_->setExpanding(false);
-    tab_toolbar->addWidget(tab_bar_);
+    buildTitleBar();
 
     status_label_ = new QLabel(this);
     statusBar()->addWidget(status_label_, 1);
@@ -73,13 +125,54 @@ BesraWindow::BesraWindow(QWidget *parent) : QMainWindow(parent)
     connect(tab_bar_, &QTabBar::tabCloseRequested, this, &BesraWindow::onTabCloseRequested);
     connect(tab_bar_, &QTabBar::tabMoved, this, &BesraWindow::onTabMoved);
 
+    qApp->installEventFilter(this);
+
     resize(1200, 800);
     setWindowTitle(QStringLiteral("Besra"));
 }
 
 BesraWindow::~BesraWindow()
 {
+    qApp->removeEventFilter(this);
     registry().removeAll(this);
+}
+
+void BesraWindow::buildTitleBar()
+{
+    auto *bar = new TitleBarToolBar(tr("Tabs"), this);
+    bar->setMovable(false);
+    addToolBar(bar);
+
+    tab_bar_ = new QTabBar(bar);
+    tab_bar_->setTabsClosable(true);
+    tab_bar_->setMovable(true);
+    tab_bar_->setExpanding(false);
+    bar->addWidget(tab_bar_);
+
+    /* Pushes the window-control buttons to the far right of the row,
+     * same as the tab strip's own empty space -- clicks here also fall
+     * through to TitleBarToolBar's drag/maximize handling since a plain
+     * QWidget doesn't consume mouse events on its own. */
+    auto *spacer = new QWidget(bar);
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    bar->addWidget(spacer);
+
+    minimize_button_ = new QToolButton(bar);
+    minimize_button_->setText(QStringLiteral("─"));
+    minimize_button_->setToolTip(tr("Minimize"));
+    connect(minimize_button_, &QToolButton::clicked, this, &BesraWindow::onMinimize);
+    bar->addWidget(minimize_button_);
+
+    maximize_button_ = new QToolButton(bar);
+    connect(maximize_button_, &QToolButton::clicked, this, &BesraWindow::onMaximizeRestore);
+    bar->addWidget(maximize_button_);
+    updateMaximizeIcon();
+
+    close_button_ = new QToolButton(bar);
+    close_button_->setText(QStringLiteral("✕"));
+    close_button_->setToolTip(tr("Close"));
+    connect(close_button_, &QToolButton::clicked, this, &QWidget::close);
+    bar->addWidget(close_button_);
 }
 
 void BesraWindow::buildToolbar(const QList<QMenu *> &menus)
@@ -120,6 +213,10 @@ void BesraWindow::buildToolbar(const QList<QMenu *> &menus)
     hamburger->setText(QStringLiteral("☰"));
     hamburger->setToolTip(tr("Menu"));
     hamburger->setPopupMode(QToolButton::InstantPopup);
+    /* The hamburger glyph already signals "opens a menu" -- the style's
+     * default extra dropdown-arrow indicator next to it is redundant. */
+    hamburger->setStyleSheet(QStringLiteral(
+        "QToolButton::menu-indicator { image: none; width: 0; }"));
     QMenu *hamburger_menu = new QMenu(hamburger);
     for (QMenu *menu : menus) {
         hamburger_menu->addMenu(menu);
@@ -177,6 +274,10 @@ BrowserTab *BesraWindow::addTab(struct browser_window *bw, bool foreground)
     BrowserTab *tab = new BrowserTab(bw, this, tab_stack_);
     tab_stack_->addWidget(tab);
     int index = tab_bar_->addTab(tr("New Tab"));
+    /* Placeholder icon until the real favicon (if any) arrives via
+     * refreshChrome(), matching Firefox showing a generic icon rather
+     * than a blank tab while a page is loading. */
+    tab_bar_->setTabIcon(index, QIcon(QStringLiteral(":/res/besra-logo.png")));
     if (foreground) {
         tab_bar_->setCurrentIndex(index);
         tab_stack_->setCurrentIndex(index);
@@ -437,6 +538,101 @@ void BesraWindow::onTabMoved(int from, int to)
         tab_stack_->insertWidget(to, widget);
         tab_stack_->setCurrentIndex(tab_bar_->currentIndex());
     }
+}
+
+void BesraWindow::onMinimize()
+{
+    showMinimized();
+}
+
+void BesraWindow::onMaximizeRestore()
+{
+    if (isMaximized()) {
+        showNormal();
+    } else {
+        showMaximized();
+    }
+}
+
+void BesraWindow::updateMaximizeIcon()
+{
+    if (maximize_button_ == nullptr) {
+        return;
+    }
+    maximize_button_->setText(isMaximized() ? QStringLiteral("❐") : QStringLiteral("☐"));
+    maximize_button_->setToolTip(isMaximized() ? tr("Restore") : tr("Maximize"));
+}
+
+void BesraWindow::changeEvent(QEvent *event)
+{
+    QMainWindow::changeEvent(event);
+    if (event->type() == QEvent::WindowStateChange) {
+        /* Catches maximize/restore triggered any way other than our own
+         * button/double-click (a window-manager shortcut, snapping to
+         * an edge, etc.), so the button's glyph never goes stale. */
+        updateMaximizeIcon();
+    }
+}
+
+Qt::Edges BesraWindow::resizeEdgeAt(const QPoint &pos) const
+{
+    Qt::Edges edges;
+    if (pos.x() <= kResizeMargin) {
+        edges |= Qt::LeftEdge;
+    } else if (pos.x() >= width() - kResizeMargin) {
+        edges |= Qt::RightEdge;
+    }
+    if (pos.y() <= kResizeMargin) {
+        edges |= Qt::TopEdge;
+    } else if (pos.y() >= height() - kResizeMargin) {
+        edges |= Qt::BottomEdge;
+    }
+    return edges;
+}
+
+bool BesraWindow::eventFilter(QObject *watched, QEvent *event)
+{
+    QWidget *w = qobject_cast<QWidget *>(watched);
+    if (w == nullptr || (w != this && !isAncestorOf(w))) {
+        return QMainWindow::eventFilter(watched, event);
+    }
+    if (isMaximized() || isFullScreen()) {
+        return QMainWindow::eventFilter(watched, event);
+    }
+
+    if (event->type() == QEvent::MouseMove) {
+        auto *me = static_cast<QMouseEvent *>(event);
+        QPoint local = mapFromGlobal(me->globalPosition().toPoint());
+        if (!rect().contains(local)) {
+            return QMainWindow::eventFilter(watched, event);
+        }
+        Qt::Edges edges = resizeEdgeAt(local);
+        if (edges == (Qt::TopEdge | Qt::LeftEdge) || edges == (Qt::BottomEdge | Qt::RightEdge)) {
+            setCursor(Qt::SizeFDiagCursor);
+        } else if (edges == (Qt::TopEdge | Qt::RightEdge) || edges == (Qt::BottomEdge | Qt::LeftEdge)) {
+            setCursor(Qt::SizeBDiagCursor);
+        } else if (edges & (Qt::LeftEdge | Qt::RightEdge)) {
+            setCursor(Qt::SizeHorCursor);
+        } else if (edges & (Qt::TopEdge | Qt::BottomEdge)) {
+            setCursor(Qt::SizeVerCursor);
+        } else {
+            unsetCursor();
+        }
+    } else if (event->type() == QEvent::MouseButtonPress) {
+        auto *me = static_cast<QMouseEvent *>(event);
+        if (me->button() == Qt::LeftButton) {
+            QPoint local = mapFromGlobal(me->globalPosition().toPoint());
+            Qt::Edges edges = rect().contains(local) ? resizeEdgeAt(local) : Qt::Edges();
+            if (edges != Qt::Edges()) {
+                if (QWindow *wh = windowHandle()) {
+                    wh->startSystemResize(edges);
+                    return true;
+                }
+            }
+        }
+    }
+
+    return QMainWindow::eventFilter(watched, event);
 }
 
 void BesraWindow::closeEvent(QCloseEvent *event)

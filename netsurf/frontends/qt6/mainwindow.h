@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QList>
+#include <Qt>
 
 extern "C" {
 struct browser_window;
@@ -56,6 +57,21 @@ protected:
     void closeEvent(QCloseEvent *event) override;
     void focusInEvent(QFocusEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
+    void changeEvent(QEvent *event) override;
+
+    /* Frameless-window edge/corner resize: the OS gives us none of this
+     * for free once the native decoration is gone. With no native
+     * frame, there is no strip of BesraWindow's own background left
+     * uncovered by a child widget (toolbars/central widget fill the
+     * whole client area), so per-widget mouse handlers would never see
+     * clicks near the true window edge. Catching events at the
+     * application level before any child consumes them -- the standard
+     * way around that for hand-rolled frameless resize -- and handing
+     * the actual resize off to the window manager via
+     * QWindow::startSystemResize() (the same cooperative mechanism
+     * startSystemMove() uses for dragging) when the cursor is close
+     * enough to an edge. */
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private slots:
     void onNavigate();
@@ -82,6 +98,8 @@ private slots:
     void onCurrentTabChanged(int index);
     void onTabCloseRequested(int index);
     void onTabMoved(int from, int to);
+    void onMinimize();
+    void onMaximizeRestore();
 
 private:
     /** Builds the traditional File/Edit/View/... menu bar (hidden by
@@ -91,7 +109,16 @@ private:
      * places rather than built twice. */
     QList<QMenu *> buildMenus();
     void buildToolbar(const QList<QMenu *> &menus);
+
+    /** Custom title-bar row replacing the native one (frameless window):
+     * the tab strip plus minimize/maximize/close buttons, all on one
+     * row. Dragging empty space in this row moves the window
+     * (QWindow::startSystemMove(), the same WM-cooperative mechanism
+     * real title bars use); double-clicking it toggles maximize. */
+    void buildTitleBar();
     void navigateTo(const QString &text);
+    Qt::Edges resizeEdgeAt(const QPoint &pos) const;
+    void updateMaximizeIcon();
 
     /** count()/currentIndex() etc. always match between these two --
      * every mutation below goes through both in lockstep. tab_bar_
@@ -108,6 +135,9 @@ private:
     QToolButton *back_button_;
     QToolButton *forward_button_;
     QToolButton *reload_stop_button_;
+    QToolButton *minimize_button_;
+    QToolButton *maximize_button_;
+    QToolButton *close_button_;
     QLabel *status_label_;
 
     static QList<BesraWindow *> &registry();
