@@ -1,6 +1,7 @@
 #include "browsertab.h"
 #include "mainwindow.h"
 
+#include <algorithm>
 #include <QPaintEvent>
 #include <QPainter>
 #include <QMouseEvent>
@@ -185,8 +186,22 @@ BrowserTab::~BrowserTab() = default;
 
 void BrowserTab::setScroll(int x, int y)
 {
-    x = std::max(0, x);
-    y = std::max(0, y);
+    /* Clamp against the actual scrollable range, not just the lower
+     * bound. Without this, scroll_x_/scroll_y_ (this class's own
+     * tracked position, read by scrollX()/scrollY() and used to decide
+     * what to render) can drift arbitrarily far past real content: Qt's
+     * QScrollBar::setValue() below clamps the *visible* scrollbar
+     * silently on its own, but onScrolled() (the only other place that
+     * would pull scroll_y_ back down to the clamped value) never fires
+     * here since signals are blocked during the sync. Repeated wheel
+     * events each compute the next offset from the already-unclamped
+     * value, so the internal position runs away while the visible
+     * scrollbar thumb stays pinned at the bottom -- "scrolls forever"
+     * into blank space. */
+    int maxX = std::max(0, render_widget_->width() - viewport()->width());
+    int maxY = std::max(0, render_widget_->height() - viewport()->height());
+    x = std::clamp(x, 0, maxX);
+    y = std::clamp(y, 0, maxY);
     scroll_x_ = x;
     scroll_y_ = y;
     /* Reflect into the real scrollbars without re-entering onScrolled's core
